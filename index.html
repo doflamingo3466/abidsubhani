@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Muhammad Abid Subhani — MERN Stack Developer</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Onest:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Onest:wght@400;500;600&display=swap"
+    rel="stylesheet" />
 
   <script type="importmap">
   {
@@ -92,11 +94,29 @@
       transition: background-color 350ms ease, color 350ms ease;
     }
 
-    @media (max-width: 1920px) { html { font-size: 0.833333vw; } }
-    @media (max-width: 1440px) { html { font-size: 1.111111vw; } }
-    @media (max-width: 1024px) { html { font-size: 1.5625vw; } }
+    @media (max-width: 1920px) {
+      html {
+        font-size: 0.833333vw;
+      }
+    }
+
+    @media (max-width: 1440px) {
+      html {
+        font-size: 1.111111vw;
+      }
+    }
+
+    @media (max-width: 1024px) {
+      html {
+        font-size: 1.5625vw;
+      }
+    }
+
     @media (max-width: 640px) {
-      html { font-size: 14px; }
+      html {
+        font-size: 14px;
+      }
+
       :root {
         --gutter: 1.15rem;
         --section: 5.5rem;
@@ -123,11 +143,13 @@
       max-width: 100%;
     }
 
-    ul, ol {
+    ul,
+    ol {
       list-style: none;
     }
 
-    a, button {
+    a,
+    button {
       font: inherit;
       color: inherit;
       background: none;
@@ -160,7 +182,10 @@
     }
 
     @media (min-width: 640px) {
-      .eyebrow { font-size: 0.8125rem; letter-spacing: 0.22em; }
+      .eyebrow {
+        font-size: 0.8125rem;
+        letter-spacing: 0.22em;
+      }
     }
 
     .eyebrow::before {
@@ -220,7 +245,10 @@
     }
 
     @media (min-width: 640px) {
-      .preloader-brand { font-size: 2rem; gap: 1.35rem; }
+      .preloader-brand {
+        font-size: 2rem;
+        gap: 1.35rem;
+      }
     }
 
     .preloader-counter {
@@ -232,7 +260,9 @@
     }
 
     @media (min-width: 640px) {
-      .preloader-counter { font-size: 7.5rem; }
+      .preloader-counter {
+        font-size: 7.5rem;
+      }
     }
 
     .preloader-counter span {
@@ -259,7 +289,9 @@
     }
 
     @media (min-width: 640px) {
-      header.site-nav nav { padding: 1.25rem var(--gutter); }
+      header.site-nav nav {
+        padding: 1.25rem var(--gutter);
+      }
     }
 
     .brand-lockup {
@@ -319,7 +351,9 @@
     }
 
     @media (min-width: 640px) {
-      .brand-text-group { display: flex; }
+      .brand-text-group {
+        display: flex;
+      }
     }
 
     .nav-right-group {
@@ -329,7 +363,9 @@
     }
 
     @media (min-width: 1024px) {
-      .nav-right-group { gap: 1.5rem; }
+      .nav-right-group {
+        gap: 1.5rem;
+      }
     }
 
     .nav-links {
@@ -339,7 +375,9 @@
     }
 
     @media (min-width: 1024px) {
-      .nav-links { display: flex; }
+      .nav-links {
+        display: flex;
+      }
     }
 
     .nav-links a {
@@ -420,7 +458,9 @@
     }
 
     @media (min-width: 1024px) {
-      .burger-btn { display: none; }
+      .burger-btn {
+        display: none;
+      }
     }
 
     .burger-btn span {
@@ -434,9 +474,11 @@
     .burger-btn.open span:nth-child(1) {
       transform: translateY(0.5rem) rotate(45deg);
     }
+
     .burger-btn.open span:nth-child(2) {
       opacity: 0;
     }
+
     .burger-btn.open span:nth-child(3) {
       transform: translateY(-0.5rem) rotate(-45deg);
     }
@@ -538,7 +580,9 @@
     }
 
     @media (min-width: 640px) {
-      .hero-roles { font-size: 2.85rem; }
+      .hero-roles {
+        font-size: 2.85rem;
+      }
     }
 
     .role-line-wrap {
@@ -744,7 +788,9 @@
     }
 
     @media (min-width: 640px) {
-      .marquee-section { padding-block: 2rem; }
+      .marquee-section {
+        padding-block: 2rem;
+      }
     }
 
     .marquee-track {
@@ -765,7 +811,9 @@
     }
 
     @media (min-width: 640px) {
-      .marquee-item { font-size: 3.25rem; }
+      .marquee-item {
+        font-size: 3.25rem;
+      }
     }
 
     .marquee-dot {
@@ -787,8 +835,13 @@
     }
 
     @keyframes marquee {
-      from { transform: translateX(0); }
-      to { transform: translateX(-50%); }
+      from {
+        transform: translateX(0);
+      }
+
+      to {
+        transform: translateX(-50%);
+      }
     }
 
     /* Shared Section Structure */
@@ -838,35 +891,55 @@
       transform: translateY(32px);
       transition: transform 640ms cubic-bezier(0.16, 1, 0.3, 1), opacity 640ms cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .anim-up.in-view { opacity: 1; transform: translateY(0); }
+
+    .anim-up.in-view {
+      opacity: 1;
+      transform: translateY(0);
+    }
 
     .anim-down {
       opacity: 0;
       transform: translateY(-28px);
       transition: transform 640ms cubic-bezier(0.16, 1, 0.3, 1), opacity 640ms cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .anim-down.in-view { opacity: 1; transform: translateY(0); }
+
+    .anim-down.in-view {
+      opacity: 1;
+      transform: translateY(0);
+    }
 
     .anim-left {
       opacity: 0;
       transform: translateX(-38px);
       transition: transform 700ms cubic-bezier(0.16, 1, 0.3, 1), opacity 700ms cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .anim-left.in-view { opacity: 1; transform: translateX(0); }
+
+    .anim-left.in-view {
+      opacity: 1;
+      transform: translateX(0);
+    }
 
     .anim-right {
       opacity: 0;
       transform: translateX(38px);
       transition: transform 700ms cubic-bezier(0.16, 1, 0.3, 1), opacity 700ms cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .anim-right.in-view { opacity: 1; transform: translateX(0); }
+
+    .anim-right.in-view {
+      opacity: 1;
+      transform: translateX(0);
+    }
 
     .anim-scale-tilt {
       opacity: 0;
       transform: scale(0.92) rotate(-1.2deg);
       transition: transform 740ms cubic-bezier(0.16, 1, 0.3, 1), opacity 740ms cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .anim-scale-tilt.in-view { opacity: 1; transform: scale(1) rotate(0deg); }
+
+    .anim-scale-tilt.in-view {
+      opacity: 1;
+      transform: scale(1) rotate(0deg);
+    }
 
     /* ============================================================
        LAYOUT 1: EDITORIAL SPLIT (Default)
@@ -882,8 +955,15 @@
         grid-template-columns: repeat(12, 1fr);
         gap: var(--gutter);
       }
-      .story-left { grid-column: span 6; }
-      .story-right { grid-column: span 6; padding-top: 0.5rem; }
+
+      .story-left {
+        grid-column: span 6;
+      }
+
+      .story-right {
+        grid-column: span 6;
+        padding-top: 0.5rem;
+      }
     }
 
     .story-lead {
@@ -995,6 +1075,7 @@
         grid-template-columns: repeat(2, 1fr);
         gap: var(--gutter);
       }
+
       .project-item-wrap:nth-child(even) {
         margin-top: 5rem;
       }
@@ -1055,7 +1136,9 @@
     }
 
     @media (min-width: 640px) {
-      .project-title { font-size: 1.65rem; }
+      .project-title {
+        font-size: 1.65rem;
+      }
     }
 
     .project-card:hover .project-title {
@@ -1086,10 +1169,15 @@
     }
 
     @media (min-width: 640px) {
-      .impact-grid { grid-template-columns: repeat(2, 1fr); }
+      .impact-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
     }
+
     @media (min-width: 1024px) {
-      .impact-grid { grid-template-columns: repeat(4, 1fr); }
+      .impact-grid {
+        grid-template-columns: repeat(4, 1fr);
+      }
     }
 
     .impact-cell {
@@ -1106,8 +1194,12 @@
         padding-left: 2rem;
       }
     }
+
     @media (min-width: 1024px) {
-      .impact-cell { padding-block: 3rem; }
+      .impact-cell {
+        padding-block: 3rem;
+      }
+
       .impact-cell:not(:first-child) {
         border-left: 1px solid var(--line);
         padding-left: 2rem;
@@ -1122,7 +1214,9 @@
     }
 
     @media (min-width: 640px) {
-      .impact-figure { font-size: 6.75rem; }
+      .impact-figure {
+        font-size: 6.75rem;
+      }
     }
 
     .impact-label {
@@ -1189,8 +1283,14 @@
         grid-template-columns: repeat(12, 1fr);
         gap: var(--gutter);
       }
-      .voices-selectors { grid-column: span 5; }
-      .voices-panel { grid-column: span 7; }
+
+      .voices-selectors {
+        grid-column: span 5;
+      }
+
+      .voices-panel {
+        grid-column: span 7;
+      }
     }
 
     .voice-btn {
@@ -1204,8 +1304,13 @@
       transition: transform 250ms ease;
     }
 
-    .voice-btn:hover { transform: translateX(4px); }
-    .voices-selectors li:last-child .voice-btn { border-bottom: 1px solid var(--line); }
+    .voice-btn:hover {
+      transform: translateX(4px);
+    }
+
+    .voices-selectors li:last-child .voice-btn {
+      border-bottom: 1px solid var(--line);
+    }
 
     .voice-idx {
       font-size: 0.75rem;
@@ -1214,9 +1319,13 @@
       color: var(--muted);
     }
 
-    .voice-btn.active .voice-idx { color: var(--accent); }
+    .voice-btn.active .voice-idx {
+      color: var(--accent);
+    }
 
-    .voice-info { flex: 1; }
+    .voice-info {
+      flex: 1;
+    }
 
     .voice-name {
       display: block;
@@ -1227,11 +1336,15 @@
     }
 
     @media (min-width: 640px) {
-      .voice-name { font-size: 1.65rem; }
+      .voice-name {
+        font-size: 1.65rem;
+      }
     }
 
     .voice-btn.active .voice-name,
-    .voice-btn:hover .voice-name { color: var(--foreground-bright); }
+    .voice-btn:hover .voice-name {
+      color: var(--foreground-bright);
+    }
 
     .voice-role {
       display: block;
@@ -1251,7 +1364,9 @@
       transition: width 300ms ease;
     }
 
-    .voice-btn.active .voice-rule { width: 2rem; }
+    .voice-btn.active .voice-rule {
+      width: 2rem;
+    }
 
     .voices-panel {
       display: grid;
@@ -1276,7 +1391,9 @@
     }
 
     @media (min-width: 640px) {
-      .voice-quote-text { font-size: 1.75rem; }
+      .voice-quote-text {
+        font-size: 1.75rem;
+      }
     }
 
     .word-reveal {
@@ -1335,6 +1452,7 @@
       flex-direction: column;
       align-items: flex-start;
     }
+
     html[data-layout="bento"] .hero-desc {
       text-align: left;
       background: var(--surface);
@@ -1342,13 +1460,16 @@
       padding: 1rem 1.25rem;
       border-radius: 0.2rem;
     }
+
     html[data-layout="bento"] .story-grid {
       grid-template-columns: 1fr;
     }
+
     @media (min-width: 1024px) {
       html[data-layout="bento"] .story-grid {
         grid-template-columns: repeat(12, 1fr);
       }
+
       html[data-layout="bento"] .story-left {
         grid-column: span 12;
         background: var(--surface);
@@ -1356,48 +1477,59 @@
         border-radius: 0.25rem;
         padding: 2rem;
       }
+
       html[data-layout="bento"] .story-right {
         grid-column: span 12;
       }
+
       html[data-layout="bento"] .story-cards-list {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
         gap: 1.25rem;
       }
     }
+
     html[data-layout="bento"] .story-row-item {
       border: 1px solid var(--line);
       background: var(--surface);
       border-radius: 0.2rem;
       padding: 1.5rem;
     }
+
     html[data-layout="bento"] .story-row-item:last-child {
       border-bottom: 1px solid var(--line);
     }
+
     @media (min-width: 768px) {
       html[data-layout="bento"] .projects-grid {
         grid-template-columns: repeat(2, 1fr);
       }
+
       html[data-layout="bento"] .project-item-wrap:nth-child(even) {
         margin-top: 0;
       }
+
       html[data-layout="bento"] .project-item-wrap:first-child {
         grid-column: span 2;
       }
+
       html[data-layout="bento"] .project-item-wrap:first-child .project-visual {
         aspect-ratio: 21 / 9;
       }
     }
+
     html[data-layout="bento"] .impact-grid {
       gap: 1.25rem;
       border-top: none;
     }
+
     html[data-layout="bento"] .impact-cell {
       background: var(--surface);
       border: 1px solid var(--line-strong);
       border-radius: 0.2rem;
       padding: 1.75rem;
     }
+
     @media (min-width: 1024px) {
       html[data-layout="bento"] .impact-cell:not(:first-child) {
         border-left: 1px solid var(--line-strong);
@@ -1412,67 +1544,83 @@
       left: 72%;
       transform: translateX(-50%);
     }
+
     @media (max-width: 768px) {
       html[data-layout="minimal"] .hero-portrait-wrap {
         left: 50%;
       }
     }
+
     html[data-layout="minimal"] .hero-giant-title {
       align-items: flex-start;
       padding-left: var(--gutter);
     }
+
     html[data-layout="minimal"] .story-grid {
       grid-template-columns: 1fr;
       gap: 2rem;
     }
+
     html[data-layout="minimal"] .story-left,
     html[data-layout="minimal"] .story-right {
       grid-column: span 12;
     }
+
     @media (min-width: 768px) {
       html[data-layout="minimal"] .projects-grid {
         grid-template-columns: 1fr;
         gap: 2rem;
       }
+
       html[data-layout="minimal"] .project-item-wrap:nth-child(even) {
         margin-top: 0;
       }
+
       html[data-layout="minimal"] .project-visual {
         aspect-ratio: 24 / 9;
       }
     }
+
     html[data-layout="minimal"] .impact-grid {
       grid-template-columns: 1fr;
     }
+
     @media (min-width: 640px) {
       html[data-layout="minimal"] .impact-grid {
         grid-template-columns: repeat(4, 1fr);
       }
     }
+
     html[data-layout="minimal"] .impact-figure {
       font-size: 3.5rem;
     }
+
     html[data-layout="minimal"] .voices-grid {
       grid-template-columns: 1fr;
     }
+
     html[data-layout="minimal"] .voices-selectors,
     html[data-layout="minimal"] .voices-panel {
       grid-column: span 12;
     }
+
     html[data-layout="minimal"] .voices-selectors {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 0.75rem;
     }
+
     html[data-layout="minimal"] .voice-btn {
       border: 1px solid var(--line);
       border-radius: 0.2rem;
       padding: 1rem;
       background: var(--surface);
     }
+
     html[data-layout="minimal"] .voice-btn.active {
       border-color: var(--accent);
     }
+
     html[data-layout="minimal"] .voices-selectors li:last-child .voice-btn {
       border-bottom: 1px solid var(--line);
     }
@@ -1544,7 +1692,9 @@
       color: var(--accent);
     }
 
-    .contact-email .arrow { color: var(--accent); }
+    .contact-email .arrow {
+      color: var(--accent);
+    }
 
     .footer-bar {
       margin-top: var(--section);
@@ -1560,9 +1710,19 @@
         grid-template-columns: repeat(12, 1fr);
         align-items: end;
       }
-      .footer-left { grid-column: span 6; }
-      .footer-mid { grid-column: span 3; }
-      .footer-right { grid-column: span 3; text-align: right; }
+
+      .footer-left {
+        grid-column: span 6;
+      }
+
+      .footer-mid {
+        grid-column: span 3;
+      }
+
+      .footer-right {
+        grid-column: span 3;
+        text-align: right;
+      }
     }
 
     .footer-sig {
@@ -1574,7 +1734,9 @@
     }
 
     @media (min-width: 640px) {
-      .footer-sig { font-size: 3.25rem; }
+      .footer-sig {
+        font-size: 3.25rem;
+      }
     }
 
     .footer-tagline {
@@ -1609,7 +1771,10 @@
       transition: width 280ms cubic-bezier(0.16, 1, 0.3, 1), margin-right 280ms cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .social-link:hover { color: var(--foreground-bright); }
+    .social-link:hover {
+      color: var(--foreground-bright);
+    }
+
     .social-link:hover::before {
       width: 1.5rem;
       margin-right: 0.65rem;
@@ -1623,15 +1788,30 @@
     }
 
     @media (prefers-reduced-motion: reduce) {
-      #preloader { display: none !important; }
-      .marquee-track { animation: none !important; }
-      .role-line, .hero-desc, .hero-letter, .hero-scroll-cue,
-      .line-reveal-inner, .anim-up, .anim-down, .anim-left, .anim-right, .anim-scale-tilt,
+      #preloader {
+        display: none !important;
+      }
+
+      .marquee-track {
+        animation: none !important;
+      }
+
+      .role-line,
+      .hero-desc,
+      .hero-letter,
+      .hero-scroll-cue,
+      .line-reveal-inner,
+      .anim-up,
+      .anim-down,
+      .anim-left,
+      .anim-right,
+      .anim-scale-tilt,
       .word-reveal {
         opacity: 1 !important;
         transform: none !important;
         transition: none !important;
       }
+
       .hero-portrait-img {
         opacity: 1 !important;
         visibility: visible !important;
@@ -1640,6 +1820,7 @@
     }
   </style>
 </head>
+
 <body>
   <div class="haki-fracture-bg" aria-hidden="true"></div>
 
@@ -1677,6 +1858,7 @@
           <li><a href="#impact" data-scroll>Skills</a></li>
           <li><a href="#voices" data-scroll>Focus</a></li>
           <li><a href="#contact" data-scroll>Contact</a></li>
+          <li><a href="stadium.html" target="_blank">Test Stadium</a></li>
         </ul>
 
         <div class="switcher-pair">
@@ -1723,18 +1905,15 @@
         </h2>
 
         <p class="hero-desc" id="hero-desc">
-          The will to dominate through clean architecture and unshakable execution. BS Information Technology student &amp; MERN Stack Developer Intern at SKYINFINITE Software House — building practical, scalable web applications.
+          The will to dominate through clean architecture and unshakable execution. BS Information Technology student
+          &amp; MERN Stack Developer Intern at SKYINFINITE Software House — building practical, scalable web
+          applications.
         </p>
       </div>
 
       <!-- Portrait Column — Hidden until 100%, above-the-belt, zero ripple -->
       <div class="hero-portrait-wrap">
-        <img
-          src="Profile.png"
-          alt="Muhammad Abid Subhani"
-          class="hero-portrait-img"
-          id="hero-portrait-img"
-        />
+        <img src="Profile.png" alt="Muhammad Abid Subhani" class="hero-portrait-img" id="hero-portrait-img" />
       </div>
 
       <div class="hero-gradient-base" aria-hidden="true"></div>
@@ -1770,15 +1949,21 @@
         <div class="story-left anim-left">
           <span class="eyebrow">01 / Professional Summary</span>
           <h2 class="section-heading reveal-heading" style="max-width:15ch">
-            <span class="line-reveal-wrap"><span class="line-reveal-inner" style="transition-delay:0ms">Built on</span></span>
-            <span class="line-reveal-wrap"><span class="line-reveal-inner" style="transition-delay:90ms">precision &amp;</span></span>
-            <span class="line-reveal-wrap"><span class="line-reveal-inner" style="transition-delay:180ms">execution.</span></span>
+            <span class="line-reveal-wrap"><span class="line-reveal-inner" style="transition-delay:0ms">Built
+                on</span></span>
+            <span class="line-reveal-wrap"><span class="line-reveal-inner" style="transition-delay:90ms">precision
+                &amp;</span></span>
+            <span class="line-reveal-wrap"><span class="line-reveal-inner"
+                style="transition-delay:180ms">execution.</span></span>
           </h2>
           <p class="story-lead anim-up">
-            An Information Technology student and MERN Stack Developer Intern at SKYINFINITE Software House, passionate about web development, software engineering, and building practical digital solutions.
+            An Information Technology student and MERN Stack Developer Intern at SKYINFINITE Software House, passionate
+            about web development, software engineering, and building practical digital solutions.
           </p>
           <p class="story-sub anim-down">
-            Experienced in developing web-based applications using HTML, CSS, and JavaScript, with current development experience in React.js. Interested in creating scalable applications, intuitive user interfaces, and meaningful software products while continuously strengthening full-stack development skills.
+            Experienced in developing web-based applications using HTML, CSS, and JavaScript, with current development
+            experience in React.js. Interested in creating scalable applications, intuitive user interfaces, and
+            meaningful software products while continuously strengthening full-stack development skills.
           </p>
         </div>
 
@@ -1789,7 +1974,9 @@
               <div>
                 <h3 class="story-row-title">MERN Stack Developer Intern — SKYINFINITE Software House</h3>
                 <p class="story-row-desc">
-                  Currently working in a professional software-house environment: developing and improving web development skills, working with modern JavaScript-based web technologies, applying frontend and full-stack concepts, and strengthening practical programming, debugging, and problem-solving skills.
+                  Currently working in a professional software-house environment: developing and improving web
+                  development skills, working with modern JavaScript-based web technologies, applying frontend and
+                  full-stack concepts, and strengthening practical programming, debugging, and problem-solving skills.
                 </p>
               </div>
             </li>
@@ -1798,7 +1985,8 @@
               <div>
                 <h3 class="story-row-title">BS Information Technology — The Superior University</h3>
                 <p class="story-row-desc">
-                  Currently enrolled in the 7th Semester with a 3.73 CGPA, building core competency across software engineering, database architecture, and full-stack web engineering.
+                  Currently enrolled in the 7th Semester with a 3.73 CGPA, building core competency across software
+                  engineering, database architecture, and full-stack web engineering.
                 </p>
               </div>
             </li>
@@ -1807,7 +1995,8 @@
               <div>
                 <h3 class="story-row-title">Intermediate — Garrison Cadet College Kohat</h3>
                 <p class="story-row-desc">
-                  Completed Intermediate education at Garrison Cadet College Kohat, cultivating discipline, structured command, and resilience under demanding schedules.
+                  Completed Intermediate education at Garrison Cadet College Kohat, cultivating discipline, structured
+                  command, and resilience under demanding schedules.
                 </p>
               </div>
             </li>
@@ -1816,7 +2005,8 @@
               <div>
                 <h3 class="story-row-title">Career Objective</h3>
                 <p class="story-row-desc">
-                  To grow as a software engineer by developing practical applications, contributing to real-world projects, and continuously improving full-stack development capabilities.
+                  To grow as a software engineer by developing practical applications, contributing to real-world
+                  projects, and continuously improving full-stack development capabilities.
                 </p>
               </div>
             </li>
@@ -1831,8 +2021,10 @@
         <div>
           <span class="eyebrow">02 / Featured Projects</span>
           <h2 class="section-heading reveal-heading" style="max-width:15ch">
-            <span class="line-reveal-wrap"><span class="line-reveal-inner" style="transition-delay:0ms">Engineered</span></span>
-            <span class="line-reveal-wrap"><span class="line-reveal-inner" style="transition-delay:90ms">projects.</span></span>
+            <span class="line-reveal-wrap"><span class="line-reveal-inner"
+                style="transition-delay:0ms">Engineered</span></span>
+            <span class="line-reveal-wrap"><span class="line-reveal-inner"
+                style="transition-delay:90ms">projects.</span></span>
           </h2>
         </div>
         <span class="section-count-tag">03 / Featured Builds</span>
@@ -1855,15 +2047,19 @@
                   <line x1="80" y1="275" x2="720" y2="275" />
                   <path d="M180,140 L340,245 L310,275 L490,305 L460,335 L620,410" stroke-width="1.8" />
                 </g>
-                <text x="48" y="64" fill="var(--muted)" font-family="Onest, sans-serif" font-size="13" letter-spacing="4">FLAGSHIP // ADVANCED LAN COMMUNICATION PLATFORM</text>
-                <text x="48" y="495" fill="var(--foreground-bright)" font-family="Anton, sans-serif" font-size="76" letter-spacing="2">ENMA</text>
+                <text x="48" y="64" fill="var(--muted)" font-family="Onest, sans-serif" font-size="13"
+                  letter-spacing="4">FLAGSHIP // ADVANCED LAN COMMUNICATION PLATFORM</text>
+                <text x="48" y="495" fill="var(--foreground-bright)" font-family="Anton, sans-serif" font-size="76"
+                  letter-spacing="2">ENMA</text>
               </svg>
             </div>
             <div class="project-meta">
               <div>
                 <h3 class="project-title">1. ENMA — Advanced LAN Communication Platform</h3>
                 <p class="project-desc">
-                  An advanced LAN-based communication platform designed to provide communication between users within a local network. ENMA builds upon the concept of a basic LAN Chat Application with a more advanced interface, expanded communication features, and a modern React.js architecture.
+                  An advanced LAN-based communication platform designed to provide communication between users within a
+                  local network. ENMA builds upon the concept of a basic LAN Chat Application with a more advanced
+                  interface, expanded communication features, and a modern React.js architecture.
                 </p>
               </div>
               <div style="text-align:right">
@@ -1889,15 +2085,19 @@
                   <path d="M0,435 L280,435 L380,315 L800,315" />
                   <rect x="470" y="95" width="250" height="145" stroke-opacity="0.35" />
                 </g>
-                <text x="48" y="64" fill="var(--muted)" font-family="Onest, sans-serif" font-size="13" letter-spacing="4">SEMESTER PROJECT // E-COMMERCE</text>
-                <text x="48" y="495" fill="var(--foreground-bright)" font-family="Anton, sans-serif" font-size="68" letter-spacing="2">MOTORSPORTS</text>
+                <text x="48" y="64" fill="var(--muted)" font-family="Onest, sans-serif" font-size="13"
+                  letter-spacing="4">SEMESTER PROJECT // E-COMMERCE</text>
+                <text x="48" y="495" fill="var(--foreground-bright)" font-family="Anton, sans-serif" font-size="68"
+                  letter-spacing="2">MOTORSPORTS</text>
               </svg>
             </div>
             <div class="project-meta">
               <div>
                 <h3 class="project-title">02. Motorsports Merchandise E-Commerce Store</h3>
                 <p class="project-desc">
-                  A semester project involving the development of an e-commerce website focused on motorsports merchandise. Designed to provide an online shopping experience through product presentation, website navigation, and interactive frontend functionality.
+                  A semester project involving the development of an e-commerce website focused on motorsports
+                  merchandise. Designed to provide an online shopping experience through product presentation, website
+                  navigation, and interactive frontend functionality.
                 </p>
               </div>
               <div style="text-align:right">
@@ -1923,15 +2123,19 @@
                   <circle cx="540" cy="240" r="110" />
                   <line x1="230" y1="240" x2="540" y2="240" stroke-width="1.8" />
                 </g>
-                <text x="48" y="64" fill="var(--muted)" font-family="Onest, sans-serif" font-size="13" letter-spacing="4">LOCAL NETWORK // FOUNDATION</text>
-                <text x="48" y="495" fill="var(--foreground-bright)" font-family="Anton, sans-serif" font-size="68" letter-spacing="2">LAN CHAT APP</text>
+                <text x="48" y="64" fill="var(--muted)" font-family="Onest, sans-serif" font-size="13"
+                  letter-spacing="4">LOCAL NETWORK // FOUNDATION</text>
+                <text x="48" y="495" fill="var(--foreground-bright)" font-family="Anton, sans-serif" font-size="68"
+                  letter-spacing="2">LAN CHAT APP</text>
               </svg>
             </div>
             <div class="project-meta">
               <div>
                 <h3 class="project-title">03. LAN Chat Application</h3>
                 <p class="project-desc">
-                  A browser-based local network chat application designed to demonstrate communication between users on the same network. This project established the foundation for the more advanced ENMA communication platform.
+                  A browser-based local network chat application designed to demonstrate communication between users on
+                  the same network. This project established the foundation for the more advanced ENMA communication
+                  platform.
                 </p>
               </div>
               <div style="text-align:right">
@@ -1949,8 +2153,10 @@
         <div>
           <span class="eyebrow">03 / Technical Skills &amp; Standing</span>
           <h2 class="section-heading reveal-heading">
-            <span class="line-reveal-wrap"><span class="line-reveal-inner" style="transition-delay:0ms">Stack &amp;</span></span>
-            <span class="line-reveal-wrap"><span class="line-reveal-inner" style="transition-delay:90ms">credentials.</span></span>
+            <span class="line-reveal-wrap"><span class="line-reveal-inner" style="transition-delay:0ms">Stack
+                &amp;</span></span>
+            <span class="line-reveal-wrap"><span class="line-reveal-inner"
+                style="transition-delay:90ms">credentials.</span></span>
           </h2>
         </div>
       </div>
@@ -2015,8 +2221,10 @@
         <div>
           <span class="eyebrow">04 / Core Focus &amp; Interests</span>
           <h2 class="section-heading reveal-heading">
-            <span class="line-reveal-wrap"><span class="line-reveal-inner" style="transition-delay:0ms">Engineering</span></span>
-            <span class="line-reveal-wrap"><span class="line-reveal-inner" style="transition-delay:90ms">pillars.</span></span>
+            <span class="line-reveal-wrap"><span class="line-reveal-inner"
+                style="transition-delay:0ms">Engineering</span></span>
+            <span class="line-reveal-wrap"><span class="line-reveal-inner"
+                style="transition-delay:90ms">pillars.</span></span>
           </h2>
         </div>
       </div>
@@ -2069,13 +2277,16 @@
           <blockquote style="order:2">
             <p class="voice-quote-text" id="arsenal-quote"></p>
             <div class="focus-pills" id="arsenal-tags"></div>
-            <footer style="margin-top:1.5rem; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.18em; color:var(--muted)" id="arsenal-footer"></footer>
+            <footer
+              style="margin-top:1.5rem; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.18em; color:var(--muted)"
+              id="arsenal-footer"></footer>
           </blockquote>
 
           <div class="voice-card-visual anim-scale-tilt" style="order:1" id="arsenal-card">
             <div>
               <span class="eyebrow" id="arsenal-card-code">PILLAR // 01</span>
-              <p style="margin-top:1rem; font-family:var(--font-display); font-size:2rem; line-height:0.95; text-transform:uppercase; color:var(--foreground-bright)" id="arsenal-card-title">
+              <p style="margin-top:1rem; font-family:var(--font-display); font-size:2rem; line-height:0.95; text-transform:uppercase; color:var(--foreground-bright)"
+                id="arsenal-card-title">
                 FRONTEND SYSTEMS
               </p>
             </div>
@@ -2085,7 +2296,9 @@
               <polygon points="110,32 150,65 110,98 70,65" stroke="var(--foreground-bright)" stroke-opacity="0.38" />
               <circle cx="110" cy="65" r="5.5" fill="var(--accent)" />
             </svg>
-            <div style="border-top:1px solid var(--line); padding-top:0.85rem; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.2em; color:var(--muted)" id="arsenal-card-foot">
+            <div
+              style="border-top:1px solid var(--line); padding-top:0.85rem; font-size:0.72rem; text-transform:uppercase; letter-spacing:0.2em; color:var(--muted)"
+              id="arsenal-card-foot">
               SKYINFINITE · FULL-STACK TRACK
             </div>
           </div>
@@ -2097,11 +2310,14 @@
     <footer id="contact">
       <span class="eyebrow">05 / Contact</span>
       <h2 class="contact-heading reveal-heading">
-        <span class="line-reveal-wrap"><span class="line-reveal-inner" style="transition-delay:0ms">Connect &amp;</span></span>
-        <span class="line-reveal-wrap"><span class="line-reveal-inner" style="transition-delay:90ms">collaborate.</span></span>
+        <span class="line-reveal-wrap"><span class="line-reveal-inner" style="transition-delay:0ms">Connect
+            &amp;</span></span>
+        <span class="line-reveal-wrap"><span class="line-reveal-inner"
+            style="transition-delay:90ms">collaborate.</span></span>
       </h2>
       <p class="contact-lead anim-up">
-        Location: Pakistan · BS Information Technology (7th Semester) &amp; MERN Stack Developer Intern at SKYINFINITE Software House.
+        Location: Pakistan · BS Information Technology (7th Semester) &amp; MERN Stack Developer Intern at SKYINFINITE
+        Software House.
       </p>
 
       <a href="mailto:abidsubhani3466@gmail.com" class="contact-email anim-left">
@@ -2123,7 +2339,8 @@
         <nav class="footer-mid" aria-label="Social Links">
           <ul class="social-list">
             <li>
-              <a href="https://www.linkedin.com/in/abid-subhani" target="_blank" rel="noreferrer noopener" class="social-link">
+              <a href="https://www.linkedin.com/in/abid-subhani" target="_blank" rel="noreferrer noopener"
+                class="social-link">
                 LinkedIn
               </a>
             </li>
@@ -2415,4 +2632,5 @@
     });
   </script>
 </body>
+
 </html>

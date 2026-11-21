@@ -1,0 +1,1674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>Gaddafi Stadium · 3D Match POV & Ticket Conversion Explorer</title>
+<style>
+:root {
+  --bg: #040714;
+  --fg: #f4f7ff;
+  --mut: #94a3b8;
+  --gold: #f5c542;
+  --gold-glow: rgba(245, 197, 66, 0.35);
+  --card: rgba(7, 12, 30, 0.9);
+  --card-solid: #090f24;
+  --line: rgba(255, 255, 255, 0.14);
+  --accent: #38bdf8;
+  --green: #10b981;
+  color-scheme: dark;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+* { box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
+html, body {
+  height: 100%; margin: 0; background: var(--bg); color: var(--fg);
+  font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  overflow: hidden; overscroll-behavior: none;
+}
+#root, .app { height: 100%; position: relative; }
+.cv { position: absolute; inset: 0; touch-action: none; cursor: grab; }
+.cv:active { cursor: grabbing; }
+.cv canvas { display: block; width: 100%; height: 100%; }
+
+/* Top Bar */
+.top {
+  position: absolute; left: 0; right: 0; top: 0;
+  padding: 14px 18px;
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(4, 7, 20, 0.95) 0%, rgba(4, 7, 20, 0) 100%);
+  z-index: 12;
+}
+.brand-wrap { pointer-events: auto; }
+.brand { font-weight: 900; letter-spacing: 0.15em; font-size: 14px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.brand b { color: var(--gold); }
+.live-badge {
+  background: rgba(16, 185, 129, 0.2); border: 1px solid var(--green); color: #6ee7b7;
+  font-size: 9.5px; padding: 2px 8px; border-radius: 5px; letter-spacing: 0.08em;
+  display: inline-flex; align-items: center; gap: 5px; font-weight: 800;
+}
+.live-dot { width: 6px; height: 6px; background: var(--green); border-radius: 50%; animation: pulse 1.6s infinite; }
+.match { font-size: 11px; color: var(--mut); letter-spacing: 0.06em; margin-top: 4px; font-weight: 500; }
+
+.controls-top { display: flex; gap: 7px; flex-wrap: wrap; justify-content: flex-end; pointer-events: auto; }
+.pill-btn {
+  background: rgba(12, 19, 46, 0.88); backdrop-filter: blur(10px);
+  border: 1px solid var(--line); color: var(--fg);
+  border-radius: 999px; padding: 7px 12px; font-size: 11px; font-weight: 700;
+  cursor: pointer; transition: all 0.18s; display: inline-flex; align-items: center; gap: 5px;
+}
+.pill-btn:hover { border-color: rgba(255,255,255,0.35); background: rgba(24, 36, 82, 0.95); }
+.pill-btn.active { background: var(--gold); color: #141000; border-color: var(--gold); font-weight: 800; }
+.pill-btn.cart-top {
+  background: linear-gradient(135deg, #f5c542 0%, #eab308 100%);
+  color: #140f00; border: none; font-weight: 900;
+}
+
+/* Tooltip */
+.tooltip {
+  position: absolute; pointer-events: none; z-index: 25;
+  background: rgba(7, 12, 32, 0.97); border: 1px solid var(--gold);
+  border-radius: 10px; padding: 8px 12px; font-size: 12px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.85); transform: translate(-50%, -125%);
+  white-space: nowrap;
+}
+.tooltip-title { font-weight: 800; color: var(--fg); }
+.tooltip-sub { font-size: 11px; color: var(--gold); margin-top: 2px; font-weight: 600; }
+
+/* Stand Filter Bar */
+.filter-bar {
+  position: absolute; top: 66px; left: 18px; right: 18px;
+  display: flex; gap: 7px; flex-wrap: wrap; pointer-events: auto; z-index: 10;
+}
+.chip {
+  background: rgba(10, 16, 40, 0.86); backdrop-filter: blur(10px);
+  border: 1px solid var(--line); color: var(--mut);
+  padding: 6px 11px; border-radius: 8px; font-size: 11px; font-weight: 700;
+  cursor: pointer; transition: all 0.18s; display: flex; align-items: center; gap: 6px;
+}
+.chip:hover { color: var(--fg); border-color: rgba(255,255,255,0.28); }
+.chip.active { background: rgba(255,255,255,0.14); color: var(--fg); border-color: var(--fg); }
+.chip i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+
+/* POV HUD */
+.pov-hud {
+  position: absolute; inset: 0; pointer-events: none; z-index: 8;
+  background: radial-gradient(circle at center, transparent 60%, rgba(2, 4, 12, 0.55) 100%);
+}
+.pov-compass {
+  position: absolute; top: 64px; left: 50%; transform: translateX(-50%);
+  background: rgba(8, 13, 32, 0.9); backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.16); border-radius: 999px;
+  padding: 5px 15px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em;
+  color: var(--accent); display: flex; align-items: center; gap: 10px; white-space: nowrap;
+}
+.pov-quick-cams {
+  position: absolute; top: 98px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 6px; pointer-events: auto; flex-wrap: wrap; justify-content: center;
+}
+.cam-snap {
+  background: rgba(11, 17, 42, 0.88); border: 1px solid rgba(255,255,255,0.16);
+  color: var(--fg); font-size: 10px; font-weight: 700; padding: 5px 10px;
+  border-radius: 999px; cursor: pointer; backdrop-filter: blur(6px); transition: all 0.18s;
+}
+.cam-snap:hover, .cam-snap.active { border-color: var(--gold); color: var(--gold); }
+.pov-hint {
+  position: absolute; top: 43%; left: 50%; transform: translate(-50%, -50%);
+  color: rgba(255,255,255,0.94); font-size: 12px; font-weight: 600;
+  background: rgba(5, 8, 20, 0.84); padding: 8px 16px; border-radius: 20px;
+  border: 1px solid rgba(255,255,255,0.24); animation: fadeOut 4.5s forwards;
+}
+
+/* Bottom Conversion Card */
+.card {
+  position: absolute; left: 14px; right: 14px; bottom: 14px;
+  max-width: 720px; margin: 0 auto;
+  background: var(--card); border: 1px solid var(--line);
+  border-radius: 20px; padding: 16px 18px;
+  backdrop-filter: blur(18px); box-shadow: 0 24px 60px rgba(0, 0, 0, 0.85);
+  z-index: 15;
+}
+.card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+.ttl { font-weight: 900; font-size: 15.5px; letter-spacing: 0.03em; text-transform: uppercase; }
+.badge-cat {
+  font-size: 10px; font-weight: 800; padding: 3px 9px; border-radius: 6px;
+  text-transform: uppercase; letter-spacing: 0.07em; white-space: nowrap;
+}
+.sub { font-size: 12px; color: var(--mut); margin-top: 4px; line-height: 1.4; }
+.sub b { color: var(--gold); font-weight: 800; }
+
+.stats-grid {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 7px;
+  margin-top: 10px; background: rgba(0, 0, 0, 0.36);
+  padding: 9px 7px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.08);
+}
+.stat-box { text-align: center; }
+.stat-val { font-size: 12.5px; font-weight: 800; color: var(--fg); }
+.stat-lbl { font-size: 9px; color: var(--mut); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; }
+
+.buyer-grid {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px;
+  margin-top: 8px;
+}
+.buyer-pill {
+  background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: 10px; padding: 7px 9px; font-size: 10.5px; line-height: 1.35;
+}
+.buyer-pill span { color: var(--mut); display: block; font-size: 9px; text-transform: uppercase; letter-spacing: 0.05em; }
+.buyer-pill b { color: #e2e8f0; font-weight: 700; }
+
+.perk-banner {
+  margin-top: 10px; padding: 8px 12px; border-radius: 10px;
+  background: rgba(16, 185, 129, 0.11); border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #a7f3d0; font-size: 11px; font-weight: 600;
+  display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap;
+}
+.perk-banner b { color: #f5c542; }
+
+.seat-picker {
+  display: flex; gap: 7px; flex-wrap: wrap; align-items: center;
+  margin-top: 10px; padding: 8px 10px; border-radius: 11px;
+  background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.09);
+}
+.seat-picker label { font-size: 9.5px; font-weight: 700; color: var(--mut); text-transform: uppercase; }
+.seat-picker select {
+  background: #0d1633; color: var(--fg); border: 1px solid var(--line);
+  border-radius: 7px; padding: 5px 7px; font-size: 11px; font-weight: 700; cursor: pointer;
+}
+.mini-btn {
+  margin-left: auto;
+  background: rgba(245, 197, 66, 0.15); border: 1px solid rgba(245, 197, 66, 0.45);
+  color: var(--gold); border-radius: 7px; padding: 5px 9px; font-size: 10.5px;
+  font-weight: 800; cursor: pointer; transition: all 0.18s;
+}
+.mini-btn:hover { background: rgba(245, 197, 66, 0.28); }
+
+.cart-list {
+  display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px; max-height: 60px; overflow-y: auto;
+}
+.seat-pill {
+  background: rgba(245, 197, 66, 0.16); border: 1px solid var(--gold);
+  color: var(--gold); font-size: 11px; font-weight: 700;
+  padding: 4px 9px; border-radius: 8px; display: flex; align-items: center; gap: 6px;
+}
+.seat-pill button {
+  background: none; border: none; color: var(--fg); font-weight: 900;
+  cursor: pointer; padding: 0; font-size: 13px; line-height: 1;
+}
+
+.row { display: flex; gap: 8px; margin-top: 12px; }
+.btn {
+  flex: 1; border: 1px solid var(--line); background: rgba(255,255,255,0.05);
+  color: var(--fg); border-radius: 11px; padding: 11px 12px;
+  font-size: 12.5px; font-weight: 700; cursor: pointer; transition: all 0.18s;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.btn:hover { background: rgba(255,255,255,0.12); border-color: rgba(255,255,255,0.32); }
+.btn.go {
+  background: linear-gradient(135deg, #f5c542 0%, #eab308 100%);
+  color: #140f00; border: none; font-weight: 900;
+  box-shadow: 0 4px 18px var(--gold-glow);
+}
+.btn.go:hover { transform: translateY(-1px); }
+
+.leg { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 10px; font-size: 11px; color: var(--mut); }
+.leg span { display: flex; align-items: center; }
+.leg i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+
+/* Modal */
+.modal-backdrop {
+  position: fixed; inset: 0; background: rgba(3, 6, 18, 0.88);
+  backdrop-filter: blur(12px); z-index: 50;
+  display: flex; align-items: center; justify-content: center; padding: 16px;
+}
+.modal {
+  background: var(--card-solid); border: 1px solid var(--line);
+  border-radius: 22px; max-width: 440px; width: 100%; padding: 22px;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.85);
+}
+.ticket-card {
+  background: linear-gradient(135deg, #16214d 0%, #0d1433 100%);
+  border: 1px dashed var(--gold); border-radius: 16px; padding: 16px;
+  margin: 14px 0;
+}
+.qr-box {
+  width: 62px; height: 62px; background: #fff; border-radius: 8px; padding: 4px;
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; flex-shrink: 0;
+}
+.qr-cell { background: #000; border-radius: 1px; }
+
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+@keyframes fadeOut { 0%, 75% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }
+@media (max-width: 640px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .buyer-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.3.1/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.3.1/umd/react-dom.production.min.js"></script>
+
+<script>
+const { useState, useEffect, useRef, useMemo } = React;
+const h = React.createElement;
+
+// --- REAL STADIUM BOWL & MATCH DIMENSIONS (1 unit = 1 meter, 14 rows x 24 seats) ---
+const A = 76, B = 62, NS = 24, ROWS = 14, PER = 24, PI2 = Math.PI * 2;
+const PITCH_LEN_M = 20.12;      // ICC regulation 22 yards
+const CIRCLE_R_M = 27.43;       // 30-yard fielding circle radius
+const TOWER_H_M = 68;           // Floodlight mast height
+const TIERS = [
+  { n: 'Lower Level', k0: 0.54, k1: 0.79, y0: 1.8, y1: 12.2, b: 101 },
+  { n: 'Upper Level', k0: 0.83, k1: 1.03, y0: 16.2, y1: 30.5, b: 201 }
+];
+
+const hash = (a, b, c) => {
+  let x = (a * 73856093) ^ (b * 19349663) ^ (c * 83492791);
+  x = Math.imul(x ^ (x >>> 13), 1274126177);
+  return ((x ^ (x >>> 16)) >>> 0) % 100;
+};
+const isSold = (ti, si, r, s) => hash(ti * 50 + si, r, s) < 35;
+
+const GEN = ['Inzamam-ul-Haq', 'Nazar', 'Quaid', 'Imtiaz Ahmed', 'Zaheer Abbas', 'Hanif Mohammad', 'Majid Khan'];
+const SIDE = {
+  3: ['Rajas', 'Premium'], 4: ['Rajas', 'Premium'],
+  5: ['Fazal Mahmood', 'VIP'], 6: ['Imran Khan', 'VIP'],
+  7: ['Saeed Anwar', 'Premium'], 8: ['Saeed Anwar', 'Premium'],
+  15: ['AH Kardar', 'Premium'], 16: ['AH Kardar', 'Premium'],
+  17: ['Abdul Qadir', 'General'], 18: ['Abdul Qadir', 'General'],
+  19: ['Sarfraz Nawaz', 'General'], 20: ['Sarfraz Nawaz', 'General']
+};
+const CAT = {
+  'PCB Gallery': [12000, 0xe0508a, '#e0508a'],
+  'VIP': [6000, 0xf08a24, '#f08a24'],
+  'Premium': [4000, 0x7a5cff, '#7a5cff'],
+  'General': [1500, 0x2f6bff, '#2f6bff']
+};
+
+const getZone = (ti, si) => {
+  let n, k;
+  if (ti === 0) {
+    [n, k] = SIDE[si] || [GEN[si % 7], 'General'];
+    n += ' Enclosure';
+  } else if ([22, 23, 0, 1].includes(si)) {
+    n = 'PCB Gallery (Hospitality)';
+    k = 'PCB Gallery';
+  } else {
+    n = 'Upper ' + GEN[si % 7] + ' Enclosure';
+    k = 'General';
+  }
+  const angleDeg = ((si + 0.5) / NS) * 360;
+  let viewAngle = 'Square Leg / Point';
+  if ((angleDeg > 335 || angleDeg < 25) || (angleDeg > 155 && angleDeg < 205)) viewAngle = 'Behind Bowler (Straight)';
+  else if ((angleDeg >= 25 && angleDeg <= 65) || (angleDeg >= 115 && angleDeg <= 155) || (angleDeg >= 205 && angleDeg <= 245) || (angleDeg >= 295 && angleDeg <= 335)) viewAngle = 'Mid-Wicket / Cover';
+
+  return { n, cat: k, p: CAT[k][0], c: CAT[k][1], css: CAT[k][2], g: k === 'General', viewAngle };
+};
+
+const pkr = n => 'PKR ' + n.toLocaleString('en-US');
+const rowLetter = r => String.fromCharCode(65 + r);
+
+// --- OPTIMIZED PROCEDURAL MAPS (LOW CPU/MEMORY FOOTPRINT, CLEAN DETAIL) ---
+function createGrassMaps() {
+  const c = document.createElement('canvas');
+  c.width = c.height = 512;
+  const ctx = c.getContext('2d');
+  const sw = 32;
+  for (let x = 0; x < 512; x += sw) {
+    ctx.fillStyle = (x / sw) % 2 === 0 ? '#166334' : '#1e7d43';
+    ctx.fillRect(x, 0, sw, 512);
+  }
+  for (let i = 0; i < 8000; i++) {
+    ctx.fillStyle = Math.random() > 0.5 ? 'rgba(205,255,220,0.05)' : 'rgba(4,20,9,0.11)';
+    ctx.fillRect(Math.random() * 512, Math.random() * 512, 2, 2);
+  }
+  const map = new THREE.CanvasTexture(c);
+  map.wrapS = map.wrapT = THREE.RepeatWrapping;
+  map.repeat.set(16, 16);
+  map.anisotropy = 4;
+  return map;
+}
+
+function createPitchMaps() {
+  const c = document.createElement('canvas');
+  c.width = 512; c.height = 128;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#cfa972';
+  ctx.fillRect(0, 0, 512, 128);
+  ctx.fillStyle = 'rgba(110, 80, 38, 0.18)';
+  ctx.beginPath();
+  ctx.ellipse(135, 64, 38, 22, 0, 0, Math.PI * 2);
+  ctx.ellipse(377, 64, 38, 22, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#ffffff';
+  [42, 470].forEach(bx => {
+    ctx.fillRect(bx, 18, 3, 92);
+    const popX = bx < 256 ? bx + 26 : bx - 26;
+    ctx.fillRect(popX, 8, 3, 112);
+  });
+  const map = new THREE.CanvasTexture(c);
+  map.anisotropy = 4;
+  return map;
+}
+
+function createConcreteStepMaps() {
+  const c = document.createElement('canvas');
+  c.width = 256; c.height = 256;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#253042';
+  ctx.fillRect(0, 0, 256, 256);
+  for (let y = 0; y < 256; y += 25.6) {
+    ctx.fillStyle = '#121824';
+    ctx.fillRect(0, y, 256, 4);
+    ctx.fillStyle = 'rgba(245, 197, 66, 0.55)';
+    ctx.fillRect(0, y + 4, 256, 2);
+  }
+  const map = new THREE.CanvasTexture(c);
+  map.wrapS = map.wrapT = THREE.RepeatWrapping;
+  map.anisotropy = 4;
+  return map;
+}
+
+function createFacadeMaps() {
+  const c = document.createElement('canvas');
+  c.width = 256; c.height = 256;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#582222';
+  ctx.fillRect(0, 0, 256, 256);
+  ctx.fillStyle = '#cbd5e1';
+  ctx.fillRect(0, 0, 256, 18);
+  ctx.fillRect(0, 120, 256, 16);
+  ctx.fillRect(0, 238, 256, 18);
+  [32, 160].forEach(ax => {
+    [65, 182].forEach(ay => {
+      ctx.fillStyle = '#060a18';
+      ctx.beginPath();
+      ctx.arc(ax + 32, ay, 26, Math.PI, 0);
+      ctx.lineTo(ax + 58, ay + 46);
+      ctx.lineTo(ax + 6, ay + 46);
+      ctx.closePath();
+      ctx.fill();
+    });
+  });
+  const map = new THREE.CanvasTexture(c);
+  map.wrapS = map.wrapT = THREE.RepeatWrapping;
+  map.repeat.set(24, 1);
+  map.anisotropy = 4;
+  return map;
+}
+
+function createInteriorWallMaps() {
+  const c = document.createElement('canvas');
+  c.width = 256; c.height = 128;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#121a2b';
+  ctx.fillRect(0, 0, 256, 128);
+  ctx.fillStyle = '#475569';
+  ctx.fillRect(0, 0, 256, 14);
+  ctx.fillRect(0, 112, 256, 16);
+  for (let x = 0; x < 256; x += 32) {
+    ctx.fillStyle = '#334155';
+    ctx.fillRect(x, 14, 6, 98);
+  }
+  const map = new THREE.CanvasTexture(c);
+  map.wrapS = map.wrapT = THREE.RepeatWrapping;
+  map.repeat.set(24, 1);
+  map.anisotropy = 4;
+  return map;
+}
+
+function createLedBannerTexture() {
+  const c = document.createElement('canvas');
+  c.width = 512; c.height = 48;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = '#06142e';
+  ctx.fillRect(0, 0, 512, 48);
+  ctx.fillStyle = '#f5c542';
+  ctx.font = '900 20px sans-serif';
+  ctx.fillText('★ GADDAFI STADIUM LAHORE · HBL PSL 11 ★', 16, 31);
+  const tex = new THREE.CanvasTexture(c);
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+  tex.repeat.set(8, 1);
+  return tex;
+}
+
+// --- SHARED BUCKET SEAT & PLAYER RIGS ---
+function buildDetailedBucketSeatGroup(colorHex, scale = 1.0) {
+  const seatGroup = new THREE.Group();
+  const shellMat = new THREE.MeshStandardMaterial({ color: colorHex, roughness: 0.36, metalness: 0.15 });
+  const trimMat = new THREE.MeshStandardMaterial({ color: 0x0f172a, roughness: 0.55, metalness: 0.35 });
+  const metalMat = new THREE.MeshStandardMaterial({ color: 0x334155, roughness: 0.4, metalness: 0.8 });
+
+  const footplate = new THREE.Mesh(new THREE.BoxGeometry(0.36, 0.04, 0.36), metalMat);
+  footplate.position.set(0, 0.02, 0.02);
+  const post = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.055, 0.34, 8), metalMat);
+  post.position.set(0, 0.18, 0.02);
+  const seatPan = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.07, 0.44), shellMat);
+  seatPan.position.set(0, 0.36, 0.04);
+  const backrest = new THREE.Mesh(new THREE.BoxGeometry(0.46, 0.48, 0.07), shellMat);
+  backrest.position.set(0, 0.62, -0.15);
+  backrest.rotation.x = -0.14;
+  const topCap = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.04, 0.09), trimMat);
+  topCap.position.set(0, 0.86, -0.18);
+  topCap.rotation.x = -0.14;
+
+  seatGroup.add(footplate, post, seatPan, backrest, topCap);
+  [-0.25, 0.25].forEach(ax => {
+    const armPad = new THREE.Mesh(new THREE.BoxGeometry(0.075, 0.035, 0.34), trimMat);
+    armPad.position.set(ax, 0.54, 0.03);
+    seatGroup.add(armPad);
+  });
+
+  seatGroup.scale.setScalar(scale);
+  return seatGroup;
+}
+
+function buildArticulatedPlayerRig(jerseyHex, pantsHex, isBatter = false) {
+  const group = new THREE.Group();
+  const jMat = new THREE.MeshStandardMaterial({ color: jerseyHex, roughness: 0.65 });
+  const pMat = new THREE.MeshStandardMaterial({ color: pantsHex, roughness: 0.72 });
+  const skinMat = new THREE.MeshStandardMaterial({ color: 0xd99b66, roughness: 0.55 });
+  const helmMat = new THREE.MeshStandardMaterial({ color: jerseyHex, roughness: 0.3 });
+
+  const torso = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.28, 0.72, 10), jMat);
+  torso.position.y = 1.06;
+  group.add(torso);
+
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.16, 10, 10), skinMat);
+  head.position.y = 1.58;
+  group.add(head);
+
+  const helmet = new THREE.Mesh(new THREE.SphereGeometry(0.18, 10, 8, 0, PI2, 0, Math.PI * 0.62), helmMat);
+  helmet.position.y = 1.6;
+  group.add(helmet);
+
+  const leftLegPivot = new THREE.Group();
+  leftLegPivot.position.set(-0.12, 0.7, 0);
+  const lLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.085, 0.07, 0.68, 8), pMat);
+  lLeg.position.y = -0.34;
+  leftLegPivot.add(lLeg);
+  group.add(leftLegPivot);
+
+  const rightLegPivot = new THREE.Group();
+  rightLegPivot.position.set(0.12, 0.7, 0);
+  const rLeg = new THREE.Mesh(new THREE.CylinderGeometry(0.085, 0.07, 0.68, 8), pMat);
+  rLeg.position.y = -0.34;
+  rightLegPivot.add(rLeg);
+  group.add(rightLegPivot);
+
+  const leftArmPivot = new THREE.Group();
+  leftArmPivot.position.set(-0.3, 1.38, 0);
+  const lArm = new THREE.Mesh(new THREE.CylinderGeometry(0.065, 0.055, 0.52, 8), jMat);
+  lArm.position.y = -0.26;
+  leftArmPivot.add(lArm);
+  group.add(leftArmPivot);
+
+  const rightArmPivot = new THREE.Group();
+  rightArmPivot.position.set(0.3, 1.38, 0);
+  const rArm = new THREE.Mesh(new THREE.CylinderGeometry(0.065, 0.055, 0.52, 8), jMat);
+  rArm.position.y = -0.26;
+  rightArmPivot.add(rArm);
+
+  if (isBatter) {
+    const bat = new THREE.Mesh(
+      new THREE.BoxGeometry(0.11, 0.62, 0.04),
+      new THREE.MeshStandardMaterial({ color: 0xe8c584, roughness: 0.45 })
+    );
+    bat.position.set(0, -0.72, 0.08);
+    bat.rotation.x = 0.55;
+    rightArmPivot.add(bat);
+  }
+  group.add(rightArmPivot);
+
+  return { group, leftLegPivot, rightLegPivot, leftArmPivot, rightArmPivot, isBatter };
+}
+
+// --- OPTIMIZED 3D STADIUM SCENE WITH PLAYERS & CONVERSION VISUALS ---
+function bootStadium(el, callbacks) {
+  const V = THREE.Vector3;
+  const R = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+  R.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+  R.shadowMap.enabled = false;
+  R.toneMapping = THREE.ACESFilmicToneMapping;
+  R.toneMappingExposure = 1.24;
+  el.appendChild(R.domElement);
+
+  const S = new THREE.Scene();
+  S.background = new THREE.Color(0x040714);
+  S.fog = new THREE.FogExp2(0x040714, 0.00105);
+
+  const cam = new THREE.PerspectiveCamera(50, 1, 0.08, 1600);
+
+  const hemiLight = new THREE.HemisphereLight(0xdbeafe, 0x1e293b, 1.08);
+  S.add(hemiLight);
+
+  const mainLight = new THREE.DirectionalLight(0xfff8eb, 1.28);
+  mainLight.position.set(80, 155, 70);
+  S.add(mainLight);
+
+  const P = (ti, si, u, f) => {
+    const T = TIERS[ti];
+    const t = ((si + 0.035 + 0.93 * u) / NS) * PI2;
+    const k = T.k0 + (T.k1 - T.k0) * f;
+    return new V(A * k * Math.cos(t), T.y0 + (T.y1 - T.y0) * f, B * k * Math.sin(t));
+  };
+
+  // --- 1. STADIUM BOWL, WALLS, PILASTERS & HANDRAILS ---
+  const plaza = new THREE.Mesh(
+    new THREE.CylinderGeometry(1, 1, 1.1, 64),
+    new THREE.MeshStandardMaterial({ color: 0x0b1222, roughness: 0.9 })
+  );
+  plaza.scale.set(A * 1.12, 1, B * 1.12);
+  plaza.position.y = -0.68;
+  S.add(plaza);
+
+  const outerWall = new THREE.Mesh(
+    new THREE.CylinderGeometry(1.045, 1.045, 31, 64, 1, true),
+    new THREE.MeshStandardMaterial({ map: createFacadeMaps(), side: THREE.DoubleSide, roughness: 0.85 })
+  );
+  outerWall.scale.set(A, 1, B);
+  outerWall.position.y = 15;
+  S.add(outerWall);
+
+  const interiorWallMap = createInteriorWallMaps();
+  const lowerBackWall = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.805, 0.805, 4.4, 64, 1, true),
+    new THREE.MeshStandardMaterial({ map: interiorWallMap, side: THREE.DoubleSide, roughness: 0.78, metalness: 0.18 })
+  );
+  lowerBackWall.scale.set(A, 1, B);
+  lowerBackWall.position.y = 14.2;
+  S.add(lowerBackWall);
+
+  const upperBackWall = new THREE.Mesh(
+    new THREE.CylinderGeometry(1.038, 1.038, 5.0, 64, 1, true),
+    new THREE.MeshStandardMaterial({ map: interiorWallMap, side: THREE.DoubleSide, roughness: 0.78, metalness: 0.18 })
+  );
+  upperBackWall.scale.set(A, 1, B);
+  upperBackWall.position.y = 30.6;
+  S.add(upperBackWall);
+
+  const pilasterGeo = new THREE.BoxGeometry(0.65, 4.3, 0.75);
+  const pilasterMat = new THREE.MeshStandardMaterial({ color: 0x3b4963, roughness: 0.7, metalness: 0.25 });
+  for (let i = 0; i < 24; i++) {
+    const t = (i / 24) * PI2;
+    const pil = new THREE.Mesh(pilasterGeo, pilasterMat);
+    pil.position.set(A * 0.802 * Math.cos(t), 14.2, B * 0.802 * Math.sin(t));
+    pil.lookAt(0, 14.2, 0);
+    S.add(pil);
+  }
+
+  const innerWall = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.515, 0.515, 2.2, 64, 1, true),
+    new THREE.MeshStandardMaterial({ map: interiorWallMap, side: THREE.DoubleSide, roughness: 0.72 })
+  );
+  innerWall.scale.set(A, 1, B);
+  innerWall.position.y = 0.9;
+  S.add(innerWall);
+
+  [TIERS[0], TIERS[1]].forEach(T => {
+    const railPts = [];
+    for (let i = 0; i <= 64; i++) {
+      const ang = (i / 64) * PI2;
+      railPts.push(new V(A * (T.k0 - 0.006) * Math.cos(ang), T.y0 + 0.96, B * (T.k0 - 0.006) * Math.sin(ang)));
+    }
+    S.add(new THREE.Mesh(
+      new THREE.TubeGeometry(new THREE.CatmullRomCurve3(railPts, true), 64, 0.045, 5, true),
+      new THREE.MeshStandardMaterial({ color: 0xe2e8f0, metalness: 0.85, roughness: 0.2 })
+    ));
+  });
+
+  // --- 2. OUTFIELD, 30-YARD CIRCLE, BOUNDARY ROPE, PITCH & PLAYERS ---
+  const outfield = new THREE.Mesh(
+    new THREE.CylinderGeometry(1, 1, 0.3, 64),
+    new THREE.MeshStandardMaterial({ map: createGrassMaps(), roughness: 0.84 })
+  );
+  outfield.scale.set(A * 0.515, 1, B * 0.515);
+  outfield.position.y = -0.15;
+  S.add(outfield);
+
+  const circlePts = [];
+  for (let i = 0; i <= 64; i++) {
+    const t = (i / 64) * PI2;
+    circlePts.push(new V(CIRCLE_R_M * Math.cos(t), 0.03, 25.0 * Math.sin(t)));
+  }
+  S.add(new THREE.Mesh(
+    new THREE.TubeGeometry(new THREE.CatmullRomCurve3(circlePts, true), 64, 0.055, 5, true),
+    new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.68 })
+  ));
+
+  const boundaryPts = [];
+  for (let i = 0; i <= 88; i++) {
+    const t = (i / 88) * PI2;
+    boundaryPts.push(new V(A * 0.47 * Math.cos(t), 0.14, B * 0.47 * Math.sin(t)));
+  }
+  S.add(new THREE.Mesh(
+    new THREE.TubeGeometry(new THREE.CatmullRomCurve3(boundaryPts, true), 88, 0.14, 5, true),
+    new THREE.MeshStandardMaterial({ color: 0xf8fafc, roughness: 0.4 })
+  ));
+
+  const ledTex = createLedBannerTexture();
+  const ledBoard = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.508, 0.508, 1.1, 64, 1, true),
+    new THREE.MeshBasicMaterial({ map: ledTex, side: THREE.DoubleSide })
+  );
+  ledBoard.scale.set(A, 1, B);
+  ledBoard.position.y = 0.65;
+  S.add(ledBoard);
+
+  const pitchMesh = new THREE.Mesh(
+    new THREE.BoxGeometry(PITCH_LEN_M, 0.08, 3.05),
+    new THREE.MeshStandardMaterial({ map: createPitchMaps(), roughness: 0.88 })
+  );
+  pitchMesh.position.y = 0.04;
+  S.add(pitchMesh);
+
+  [-9.8, 9.8].forEach(x => {
+    [-0.11, 0, 0.11].forEach(z => {
+      const stump = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.035, 0.035, 0.71, 6),
+        new THREE.MeshStandardMaterial({ color: 0xfef08a, roughness: 0.35 })
+      );
+      stump.position.set(x, 0.4, z);
+      S.add(stump);
+    });
+  });
+
+  // Players on field (lightweight 11-player match setup)
+  const players = [];
+  const specs = [
+    [-8.6, 0.25, 0x16a34a, 0xf8fafc, true],
+    [8.6, -0.75, 0x16a34a, 0xf8fafc, true],
+    [11.6, 0.0, 0xdc2626, 0x1e293b, false],
+    [-14.8, 0.0, 0xdc2626, 0x1e293b, false],
+    [11.5, 4.4, 0xdc2626, 0x1e293b, false],
+    [11.2, -5.0, 0xdc2626, 0x1e293b, false],
+    [-2.0, 17.5, 0xdc2626, 0x1e293b, false],
+    [-19.5, -14.5, 0xdc2626, 0x1e293b, false],
+    [5.5, -21.0, 0xdc2626, 0x1e293b, false],
+    [23.0, 13.5, 0xdc2626, 0x1e293b, false],
+    [-24.5, 11.5, 0xdc2626, 0x1e293b, false]
+  ];
+  specs.forEach(([px, pz, jc, pc, isBat], idx) => {
+    const rig = buildArticulatedPlayerRig(jc, pc, isBat);
+    rig.group.position.set(px, 0.08, pz);
+    rig.group.lookAt(0, 0.08, 0);
+    S.add(rig.group);
+    players.push({ ...rig, baseX: px, baseZ: pz, phase: idx * 0.8 });
+  });
+
+  const ball = new THREE.Mesh(
+    new THREE.SphereGeometry(0.14, 10, 10),
+    new THREE.MeshBasicMaterial({ color: 0xffffff })
+  );
+  S.add(ball);
+
+  // Sightline beam from seat POV to pitch center
+  const sightlineGeo = new THREE.BufferGeometry().setFromPoints([new V(0, 0, 0), new V(0, 0.4, 0)]);
+  const sightlineBeam = new THREE.Line(
+    sightlineGeo,
+    new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.7 })
+  );
+  sightlineBeam.visible = false;
+  S.add(sightlineBeam);
+
+  // --- 3. ROOF, 68m FLOODLIGHT TOWERS & SCOREBOARD ---
+  const roofRing = new THREE.Mesh(
+    new THREE.RingGeometry(A * 0.86, A * 1.06, 64, 1),
+    new THREE.MeshStandardMaterial({ color: 0xe2e8f0, side: THREE.DoubleSide, transparent: true, opacity: 0.82, roughness: 0.4 })
+  );
+  roofRing.rotation.x = Math.PI / 2;
+  roofRing.scale.set(1, B / A, 1);
+  roofRing.position.y = 32.8;
+  S.add(roofRing);
+
+  const floodlightBulbs = [];
+  [42, 138, 222, 318].forEach(deg => {
+    const t = (deg * Math.PI) / 180;
+    const tower = new THREE.Group();
+    const mast = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.65, 1.35, TOWER_H_M, 8),
+      new THREE.MeshStandardMaterial({ color: 0x475569, metalness: 0.6, roughness: 0.4 })
+    );
+    mast.position.y = TOWER_H_M * 0.5;
+    tower.add(mast);
+
+    const headFrame = new THREE.Mesh(
+      new THREE.BoxGeometry(15, 8.5, 1.2),
+      new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.8, roughness: 0.25 })
+    );
+    headFrame.position.y = TOWER_H_M;
+    tower.add(headFrame);
+
+    const bulbMat = new THREE.MeshBasicMaterial({ color: 0xfffbeb });
+    floodlightBulbs.push(bulbMat);
+    const bulbGeo = new THREE.BoxGeometry(2.1, 1.6, 0.35);
+    for (let bx = -5.5; bx <= 5.5; bx += 2.75) {
+      for (let by = -2.4; by <= 2.4; by += 2.4) {
+        const bulb = new THREE.Mesh(bulbGeo, bulbMat);
+        bulb.position.set(bx, TOWER_H_M + by, 0.65);
+        tower.add(bulb);
+      }
+    }
+
+    tower.position.set(A * 1.15 * Math.cos(t), 0, B * 1.15 * Math.sin(t));
+    tower.lookAt(0, 15, 0);
+    S.add(tower);
+  });
+
+  const sbCanvas = document.createElement('canvas');
+  sbCanvas.width = 512; sbCanvas.height = 256;
+  const sbCtx = sbCanvas.getContext('2d');
+  sbCtx.fillStyle = '#060b1d'; sbCtx.fillRect(0, 0, 512, 256);
+  sbCtx.strokeStyle = '#f5c542'; sbCtx.lineWidth = 8; sbCtx.strokeRect(8, 8, 496, 240);
+  sbCtx.fillStyle = '#f5c542'; sbCtx.font = 'bold 26px sans-serif'; sbCtx.fillText('HBL PSL 11 · GADDAFI LAHORE', 34, 54);
+  sbCtx.fillStyle = '#ffffff'; sbCtx.font = 'bold 48px monospace'; sbCtx.fillText('LQ  184/4 (18.2)', 34, 134);
+  sbCtx.fillStyle = '#38bdf8'; sbCtx.font = 'bold 24px sans-serif'; sbCtx.fillText('SEATS OPEN · INSTANT E-PASS', 34, 198);
+  const scoreboard = new THREE.Mesh(
+    new THREE.BoxGeometry(27, 13.5, 1.5),
+    new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(sbCanvas) })
+  );
+  scoreboard.position.set(0, 37.5, -B * 1.03);
+  scoreboard.lookAt(0, 16, 0);
+  S.add(scoreboard);
+
+  // --- 4. TIERS, 14x24 BUCKET SEATS & CROWD ---
+  const stepMap = createConcreteStepMaps();
+  const secs = [];
+  TIERS.forEach((T, ti) => {
+    for (let si = 0; si < NS; si++) {
+      const pos = [], uv = [], idx = [], nt = 5;
+      for (let i = 0; i <= nt; i++) {
+        for (let j = 0; j < 2; j++) {
+          const p = P(ti, si, i / nt, j);
+          pos.push(p.x, p.y, p.z);
+          uv.push(i / nt, j);
+        }
+      }
+      for (let i = 0; i < nt; i++) {
+        const a = i * 2;
+        idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2);
+      }
+      const ge = new THREE.BufferGeometry();
+      ge.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+      ge.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+      ge.setIndex(idx);
+      ge.computeVertexNormals();
+
+      const zInfo = getZone(ti, si);
+      const mat = new THREE.MeshStandardMaterial({
+        map: stepMap,
+        color: zInfo.c,
+        side: THREE.DoubleSide,
+        roughness: 0.74,
+        metalness: 0.12,
+        transparent: true,
+        opacity: 1
+      });
+      const m = new THREE.Mesh(ge, mat);
+      m.userData = { ti, si, zInfo };
+      S.add(m);
+      secs.push(m);
+    }
+  });
+
+  const crowdCount = 2200;
+  const crowdGeo = new THREE.CylinderGeometry(0.22, 0.28, 0.85, 6);
+  const crowdMat = new THREE.MeshStandardMaterial({ roughness: 0.7 });
+  const crowdMesh = new THREE.InstancedMesh(crowdGeo, crowdMat, crowdCount);
+  const dummy = new THREE.Object3D();
+  const cCol = new THREE.Color();
+  const jerseyColors = [0x22c55e, 0xef4444, 0xf8fafc, 0xf5c542, 0x38bdf8];
+
+  for (let i = 0; i < crowdCount; i++) {
+    const ti = i % 2;
+    const si = (i * 7) % NS;
+    const pos = P(ti, si, ((i * 13) % 100) / 100, ((i * 29) % 100) / 100);
+    dummy.position.set(pos.x, pos.y + 0.55, pos.z);
+    dummy.lookAt(0, pos.y + 0.55, 0);
+    dummy.updateMatrix();
+    crowdMesh.setMatrixAt(i, dummy.matrix);
+    cCol.setHex(jerseyColors[i % jerseyColors.length]);
+    crowdMesh.setColorAt(i, cCol);
+  }
+  crowdMesh.instanceColor.needsUpdate = true;
+  S.add(crowdMesh);
+
+  // --- 5. CAMERA & INTERACTION STATE ---
+  let mode = 'over';
+  let rot = 0.45, elev = 0.82, dist = 200;
+  let drag = null, seats = null, curSec = null, hoveredSec = null, hoveredSeatKey = null;
+  let yaw = 0, camPitch = 0, raf;
+  let showSightline = false;
+  let selectedKeys = new Set();
+  let currentSeatPos = new V();
+  let boundaryHitAnim = null;
+  let cheerTimer = 0;
+
+  const want = { p: new V(0, 150, 130), t: new V(0, 2, 0), f: 48 };
+  const tgt = new V();
+
+  const updateSightlineBeam = () => {
+    if (mode !== 'seat' || !showSightline) {
+      sightlineBeam.visible = false;
+      return;
+    }
+    const posAttr = sightlineGeo.getAttribute('position');
+    posAttr.setXYZ(0, want.p.x, want.p.y - 0.15, want.p.z);
+    posAttr.setXYZ(1, 0, 0.4, 0);
+    posAttr.needsUpdate = true;
+    sightlineBeam.visible = true;
+  };
+
+  const secCam = (ti, si) => {
+    const m = P(ti, si, 0.5, 0.5);
+    const c = new V(-m.x, 0, -m.z).normalize();
+    const hf = Math.tan((52 * Math.PI) / 360) * Math.min(cam.aspect, 1.5);
+    const D = Math.max(26, 13 / hf);
+    want.p.copy(m).addScaledVector(c, D * 0.88);
+    want.p.y += D * 0.52;
+    want.t.copy(m);
+    want.f = 52;
+  };
+
+  const clearSeats = () => {
+    if (seats) {
+      S.remove(seats.group);
+      seats = null;
+    }
+    hoveredSeatKey = null;
+    crowdMesh.visible = true;
+    sightlineBeam.visible = false;
+  };
+
+  const paintSeats = () => {
+    if (!seats) return;
+    const zc = getZone(seats.ti, seats.si).c;
+    seats.items.forEach(({ key, sold, shellMeshes }) => {
+      let hx = zc;
+      if (sold) hx = 0x283252;
+      else if (selectedKeys.has(key)) hx = 0x10b981;
+      else if (key === seats.activeKey) hx = 0xf5c542;
+      else if (key === hoveredSeatKey) hx = 0xffffff;
+      shellMeshes.forEach(mesh => mesh.material.color.setHex(hx));
+    });
+  };
+
+  const getSecInfo = (ti, si) => {
+    const z = getZone(ti, si);
+    let avail = 0;
+    const openByRow = Array(ROWS).fill(0);
+    for (let r = 0; r < ROWS; r++) {
+      for (let s = 0; s < PER; s++) {
+        if (!isSold(ti, si, r, s)) {
+          avail++;
+          openByRow[r]++;
+        }
+      }
+    }
+    const frontRowOpen = openByRow[0] + openByRow[1] + openByRow[2];
+    const center = P(ti, si, 0.5, 0.35);
+    const pitchDistM = Math.round(center.distanceTo(new V(0, 0.4, 0)));
+    const pkrPerMeter = Math.round(z.p / Math.max(1, pitchDistM));
+    return {
+      mode: 'section',
+      ti, si,
+      id: TIERS[ti].b + si,
+      z: z.n,
+      cat: z.cat,
+      css: z.css,
+      p: z.p,
+      lvl: TIERS[ti].n,
+      viewAngle: z.viewAngle,
+      n: avail,
+      total: ROWS * PER,
+      rows: ROWS,
+      perRow: PER,
+      frontRowOpen,
+      pitchDistM,
+      pkrPerMeter
+    };
+  };
+
+  function showSeats(ti, si) {
+    clearSeats();
+    crowdMesh.visible = false;
+
+    const group = new THREE.Group();
+    const items = [];
+    const zc = getZone(ti, si).c;
+    const seatScale = ti === 0 ? 0.86 : 0.96;
+
+    const specBodyMat = new THREE.MeshStandardMaterial({ roughness: 0.65 });
+    const specHeadMat = new THREE.MeshStandardMaterial({ color: 0xd99b66, roughness: 0.55 });
+
+    for (let r = 0; r < ROWS; r++) {
+      for (let s = 0; s < PER; s++) {
+        const p = P(ti, si, (s + 0.5) / PER, r / (ROWS - 1));
+        const key = `${ti}-${si}-${r}-${s}`;
+        const sold = isSold(ti, si, r, s);
+
+        const seatObj = buildDetailedBucketSeatGroup(zc, seatScale);
+        seatObj.position.copy(p);
+        seatObj.lookAt(0, p.y, 0);
+        group.add(seatObj);
+
+        const shellMeshes = [];
+        seatObj.traverse(child => {
+          child.userData = { r, s, key, sold };
+          if (child.isMesh && child.material && child.material.color && child.material.color.getHex() === zc) {
+            child.material = child.material.clone();
+            shellMeshes.push(child);
+          }
+        });
+
+        let spec = null;
+        if (sold) {
+          spec = new THREE.Group();
+          const body = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.18, 0.23, 0.64, 8),
+            specBodyMat.clone()
+          );
+          body.material.color.setHex(jerseyColors[(r * 7 + s * 3) % jerseyColors.length]);
+          body.position.y = 0.66;
+
+          const head = new THREE.Mesh(new THREE.SphereGeometry(0.13, 8, 8), specHeadMat);
+          head.position.y = 1.08;
+
+          spec.add(body, head);
+          spec.position.copy(p);
+          spec.lookAt(0, p.y, 0);
+          spec.scale.setScalar(seatScale);
+          group.add(spec);
+        }
+
+        items.push({ r, s, key, sold, shellMeshes, spec });
+      }
+    }
+
+    seats = { group, items, ti, si, activeKey: null };
+    S.add(group);
+    paintSeats();
+  }
+
+  function computeSightlineMetrics(p, ti, si, r, s) {
+    const pitchCenter = new V(0, 0.4, 0);
+    const eyePos = new V(p.x, p.y + 1.18, p.z);
+    const pitchDistM = Math.round(p.distanceTo(pitchCenter));
+    const eyeToPitchM = Math.max(1, eyePos.distanceTo(pitchCenter));
+
+    const ang = Math.atan2(p.z, p.x);
+    const boundaryPt = new V(A * 0.47 * Math.cos(ang), 0.15, B * 0.47 * Math.sin(ang));
+    const boundaryDistM = Math.max(4, Math.round(p.distanceTo(boundaryPt)));
+    const ropeFromPitchM = Math.round(boundaryPt.distanceTo(pitchCenter));
+
+    const heightM = p.y.toFixed(1);
+    const degFromPitch = Math.abs(Math.round((Math.atan2(Math.abs(p.z), Math.abs(p.x)) * 180) / Math.PI));
+    let angleLabel = 'Square Leg / Point';
+    if (degFromPitch <= 22) angleLabel = 'Behind Bowler';
+    else if (degFromPitch <= 65) angleLabel = 'Mid-Wicket / Cover';
+
+    const pitchAngularDeg = ((2 * Math.atan(10.06 / eyeToPitchM) * 180) / Math.PI).toFixed(1);
+    const stumpAngularArcMin = Math.round(((2 * Math.atan(0.355 / eyeToPitchM) * 180) / Math.PI) * 60);
+
+    let adjacentOpen = 0;
+    if (s > 0 && !isSold(ti, si, r, s - 1)) adjacentOpen++;
+    if (s < PER - 1 && !isSold(ti, si, r, s + 1)) adjacentOpen++;
+
+    const z = getZone(ti, si);
+    const valueIndex = (pitchDistM / Math.max(1, z.p / 1000)).toFixed(1);
+
+    let buyerPick = 'Balanced Match View';
+    if (ti === 0 && r <= 3) buyerPick = 'Front-Row Action Pick';
+    else if (ti === 1 && r <= 4) buyerPick = 'Tactical Bowl Pick';
+    else if (adjacentOpen >= 1) buyerPick = 'Group-Friendly Row';
+
+    const obstructionStatus = Number(heightM) >= 3.2 || r >= 2 ? 'Clear Above Rope' : 'Low Front Sightline';
+    const aisleAccess = s < 3 || s > PER - 4 ? 'Aisle Side (Easy Exit)' : 'Mid-Row Seat';
+
+    return {
+      pitchDistM,
+      boundaryDistM,
+      ropeFromPitchM,
+      heightM,
+      angleLabel,
+      pitchAngularDeg,
+      stumpAngularArcMin,
+      adjacentOpen,
+      valueIndex,
+      buyerPick,
+      obstructionStatus,
+      aisleAccess
+    };
+  }
+
+  function pickSeatData(data) {
+    if (!data || data.sold) return;
+    const { r, s, key } = data;
+    const { ti, si } = seats;
+
+    seats.activeKey = key;
+    paintSeats();
+    mode = 'seat';
+    yaw = camPitch = 0;
+
+    const p = P(ti, si, (s + 0.5) / PER, r / (ROWS - 1));
+    currentSeatPos.copy(p);
+    const dir = new V(-p.x, 0, -p.z).normalize();
+    want.p.copy(p).addScaledVector(dir, 0.22);
+    want.p.y += 1.18;
+    want.f = 56;
+    updateSightlineBeam();
+
+    const z = getZone(ti, si);
+    const metrics = computeSightlineMetrics(p, ti, si, r, s);
+
+    callbacks.onHover(null);
+    callbacks.onState({
+      mode: 'seat',
+      key, ti, si, r, s,
+      id: TIERS[ti].b + si,
+      rowLabel: rowLetter(r),
+      seatNum: s + 1,
+      z: z.n,
+      cat: z.cat,
+      css: z.css,
+      p: z.p,
+      lvl: z.n,
+      ...metrics
+    });
+  }
+
+  const api = {
+    over() {
+      mode = 'over';
+      curSec = null;
+      clearSeats();
+      callbacks.onHover(null);
+      callbacks.onState({ mode: 'over' });
+    },
+    section(ti, si) {
+      if (ti === undefined && curSec) ({ ti, si } = curSec);
+      mode = 'section';
+      curSec = { ti, si };
+      showSeats(ti, si);
+      secCam(ti, si);
+      callbacks.onHover(null);
+      callbacks.onState(getSecInfo(ti, si));
+    },
+    jumpToSeat(r, s) {
+      if (!seats) return;
+      const { ti, si } = seats;
+      const key = `${ti}-${si}-${r}-${s}`;
+      pickSeatData({ r, s, key, sold: isSold(ti, si, r, s) });
+    },
+    jumpBestValueSeat() {
+      if (!seats) return;
+      const { ti, si } = seats;
+      for (let r = 0; r < ROWS; r++) {
+        for (let s = 1; s < PER - 1; s++) {
+          if (!isSold(ti, si, r, s) && !isSold(ti, si, r, s + 1)) {
+            pickSeatData({ r, s, key: `${ti}-${si}-${r}-${s}`, sold: false });
+            return;
+          }
+        }
+      }
+      for (let r = 0; r < ROWS; r++) {
+        for (let s = 0; s < PER; s++) {
+          if (!isSold(ti, si, r, s)) {
+            pickSeatData({ r, s, key: `${ti}-${si}-${r}-${s}`, sold: false });
+            return;
+          }
+        }
+      }
+    },
+    triggerBoundaryHit() {
+      const start = new V(8.6, 0.8, -0.75);
+      const targetAngle = mode === 'seat' ? Math.atan2(currentSeatPos.z, currentSeatPos.x) : 0.35;
+      const end = new V(A * 0.47 * Math.cos(targetAngle), 1.4, B * 0.47 * Math.sin(targetAngle));
+      const peak = start.clone().lerp(end, 0.55);
+      peak.y = 18.5;
+      boundaryHitAnim = { start, peak, end, progress: 0 };
+    },
+    setSightlineBeam(enabled) {
+      showSightline = enabled;
+      updateSightlineBeam();
+    },
+    filter(cat) {
+      secs.forEach(m => {
+        const match = cat === 'ALL' || m.userData.zInfo.cat === cat;
+        m.material.opacity = match ? 1.0 : 0.16;
+        m.material.emissive.setHex(match && cat !== 'ALL' ? 0x222222 : 0x000000);
+      });
+    },
+    setDayNight(day) {
+      if (day) {
+        S.background.setHex(0x60a5fa);
+        S.fog.color.setHex(0x93c5fd);
+        hemiLight.color.setHex(0xffffff);
+        hemiLight.intensity = 1.28;
+        mainLight.intensity = 1.65;
+        floodlightBulbs.forEach(m => m.color.setHex(0x94a3b8));
+      } else {
+        S.background.setHex(0x040714);
+        S.fog.color.setHex(0x040714);
+        hemiLight.color.setHex(0xdbeafe);
+        hemiLight.intensity = 1.08;
+        mainLight.intensity = 1.28;
+        floodlightBulbs.forEach(m => m.color.setHex(0xfffbeb));
+      }
+    },
+    syncCart(keysArray) {
+      selectedKeys = new Set(keysArray);
+      if (seats) paintSeats();
+    },
+    snapPovTarget(targetType) {
+      if (mode !== 'seat') return;
+      const e = want.p;
+      const baseYaw = Math.atan2(-e.x, -e.z);
+      const basePitch = Math.atan2(-e.y + 0.5, Math.hypot(e.x, e.z));
+
+      if (targetType === 'PITCH') {
+        yaw = 0; camPitch = 0; want.f = 55;
+      } else if (targetType === 'SCOREBOARD') {
+        const sbPos = new V(0, 37.5, -B * 1.03);
+        const toSb = sbPos.clone().sub(e);
+        yaw = Math.atan2(toSb.x, toSb.z) - baseYaw;
+        camPitch = Math.atan2(toSb.y, Math.hypot(toSb.x, toSb.z)) - basePitch;
+        want.f = 46;
+      } else if (targetType === 'WIDE') {
+        yaw = 0; camPitch = 0.05; want.f = 76;
+      }
+    },
+    zoom(delta) {
+      if (mode === 'over') dist = Math.max(115, Math.min(275, dist + delta));
+      else if (mode === 'seat') want.f = Math.max(24, Math.min(82, want.f + delta * 0.25));
+    },
+    dispose() {
+      cancelAnimationFrame(raf);
+      window.removeEventListener('resize', size);
+      R.dispose();
+      el.innerHTML = '';
+    }
+  };
+
+  const ray = new THREE.Raycaster();
+  const nd = new THREE.Vector2();
+  const d = R.domElement;
+
+  function updateMouse(e) {
+    const b = d.getBoundingClientRect();
+    nd.set(((e.clientX - b.left) / b.width) * 2 - 1, -((e.clientY - b.top) / b.height) * 2 + 1);
+    ray.setFromCamera(nd, cam);
+  }
+
+  function handleHover(e) {
+    if (drag && drag.m > 5) { callbacks.onHover(null); return; }
+    updateMouse(e);
+    if (mode === 'over') {
+      const hit = ray.intersectObjects(secs)[0];
+      if (hit) {
+        const { ti, si, zInfo } = hit.object.userData;
+        if (hoveredSec !== hit.object) {
+          if (hoveredSec) hoveredSec.material.emissive.setHex(0x000000);
+          hoveredSec = hit.object;
+          hoveredSec.material.emissive.setHex(0x333333);
+        }
+        d.style.cursor = 'pointer';
+        callbacks.onHover({ x: e.clientX, y: e.clientY, title: `${zInfo.n} (Block ${TIERS[ti].b + si})`, sub: `${zInfo.cat} · ${pkr(zInfo.p)}` });
+      } else {
+        if (hoveredSec) { hoveredSec.material.emissive.setHex(0x000000); hoveredSec = null; }
+        d.style.cursor = drag ? 'grabbing' : 'grab';
+        callbacks.onHover(null);
+      }
+    } else if (mode === 'section' && seats) {
+      const hit = ray.intersectObjects(seats.group.children, true)[0];
+      const info = hit && hit.object.userData && hit.object.userData.key ? hit.object.userData : null;
+      if (info) {
+        if (hoveredSeatKey !== info.key) { hoveredSeatKey = info.key; paintSeats(); }
+        d.style.cursor = info.sold ? 'not-allowed' : 'pointer';
+        callbacks.onHover({
+          x: e.clientX, y: e.clientY,
+          title: `Row ${rowLetter(info.r)} · Seat ${info.s + 1}`,
+          sub: info.sold ? 'Occupied (Sold)' : 'Available · Tap to Preview POV'
+        });
+      } else {
+        if (hoveredSeatKey !== null) { hoveredSeatKey = null; paintSeats(); }
+        d.style.cursor = 'grab';
+        callbacks.onHover(null);
+      }
+    }
+  }
+
+  function handleTap(e) {
+    updateMouse(e);
+    if (mode === 'over') {
+      const hit = ray.intersectObjects(secs)[0];
+      if (hit) api.section(hit.object.userData.ti, hit.object.userData.si);
+    } else if (mode === 'section' && seats) {
+      const hit = ray.intersectObjects(seats.group.children, true)[0];
+      const info = hit && hit.object.userData && hit.object.userData.key ? hit.object.userData : null;
+      if (info) pickSeatData(info);
+    }
+  }
+
+  d.addEventListener('pointerdown', e => {
+    drag = { x: e.clientX, y: e.clientY, m: 0 };
+    d.setPointerCapture(e.pointerId);
+  });
+
+  d.addEventListener('pointermove', e => {
+    if (drag) {
+      const dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+      drag.x = e.clientX; drag.y = e.clientY;
+      drag.m += Math.abs(dx) + Math.abs(dy);
+      if (mode === 'over') {
+        rot -= dx * 0.0065;
+        elev = Math.max(0.32, Math.min(1.38, elev + dy * 0.0045));
+      } else if (mode === 'seat') {
+        yaw -= dx * 0.0055;
+        camPitch = Math.max(-0.75, Math.min(0.65, camPitch - dy * 0.0045));
+      }
+    }
+    if (e.pointerType === 'mouse') handleHover(e);
+  });
+
+  d.addEventListener('pointerup', e => {
+    if (drag && drag.m < 8) handleTap(e);
+    drag = null;
+  });
+
+  d.addEventListener('wheel', e => {
+    e.preventDefault();
+    api.zoom(e.deltaY * 0.08);
+  }, { passive: false });
+
+  function size() {
+    const w = el.clientWidth, hh = el.clientHeight;
+    R.setSize(w, hh);
+    cam.aspect = w / hh;
+    cam.updateProjectionMatrix();
+    dist = Math.max(160, 90 / (Math.tan((24 * Math.PI) / 360) * Math.min(cam.aspect, 1.35)));
+    if (mode === 'section' && curSec) secCam(curSec.ti, curSec.si);
+  }
+  window.addEventListener('resize', size);
+  size();
+
+  let clock = 0;
+  (function tick() {
+    raf = requestAnimationFrame(tick);
+    clock += 0.02;
+    ledTex.offset.x -= 0.0012;
+
+    if (cheerTimer > 0) cheerTimer -= 0.02;
+    const cheerLift = cheerTimer > 0 ? Math.abs(Math.sin(clock * 12)) * 0.35 : 0;
+
+    // Subtle field motion for players & boundary shot demo
+    for (let i = 0; i < players.length; i++) {
+      const p = players[i];
+      p.group.position.x = p.baseX + Math.sin(clock + p.phase) * 0.25;
+      p.group.position.z = p.baseZ + Math.cos(clock * 0.8 + p.phase) * 0.25;
+      const swing = Math.sin(clock * 3.8 + p.phase) * 0.36;
+      p.leftLegPivot.rotation.x = swing;
+      p.rightLegPivot.rotation.x = -swing;
+      p.leftArmPivot.rotation.x = -swing * 0.65;
+      p.rightArmPivot.rotation.x = p.isBatter && boundaryHitAnim ? -1.05 * Math.sin(boundaryHitAnim.progress * Math.PI) : swing * 0.65;
+    }
+
+    if (boundaryHitAnim) {
+      boundaryHitAnim.progress += 0.018;
+      const t = Math.min(1, boundaryHitAnim.progress), omt = 1 - t;
+      ball.position.set(
+        omt * omt * boundaryHitAnim.start.x + 2 * omt * t * boundaryHitAnim.peak.x + t * t * boundaryHitAnim.end.x,
+        omt * omt * boundaryHitAnim.start.y + 2 * omt * t * boundaryHitAnim.peak.y + t * t * boundaryHitAnim.end.y,
+        omt * omt * boundaryHitAnim.start.z + 2 * omt * t * boundaryHitAnim.peak.z + t * t * boundaryHitAnim.end.z
+      );
+      if (t >= 1) { boundaryHitAnim = null; cheerTimer = 1.8; }
+    } else {
+      const bt = (clock * 0.7) % 1;
+      ball.position.set(-9.8 + bt * 19.6, 0.24 + Math.abs(Math.sin(bt * Math.PI * 1.4)) * 1.0, Math.sin(bt * Math.PI) * 0.2);
+    }
+
+    if (seats && cheerLift > 0) {
+      seats.items.forEach(({ spec, r, s }, idx) => {
+        if (spec) {
+          const baseY = P(seats.ti, seats.si, (s + 0.5) / PER, r / (ROWS - 1)).y;
+          spec.position.y = baseY + cheerLift * ((idx % 3) * 0.2 + 0.3);
+        }
+      });
+    }
+
+    if (mode === 'over') {
+      if (!drag) rot += 0.0009;
+      want.p.set(
+        dist * Math.cos(elev) * Math.sin(rot),
+        dist * Math.sin(elev),
+        dist * Math.cos(elev) * Math.cos(rot)
+      );
+      want.t.set(0, 3, 0);
+      want.f = 48;
+    } else if (mode === 'seat') {
+      const e = want.p;
+      const base = Math.atan2(-e.x, -e.z);
+      const pp = Math.max(-0.85, Math.min(0.55, Math.atan2(-e.y + 0.5, Math.hypot(e.x, e.z)) + camPitch));
+      want.t.set(
+        e.x + Math.sin(base + yaw) * Math.cos(pp) * 75,
+        e.y + Math.sin(pp) * 75,
+        e.z + Math.cos(base + yaw) * Math.cos(pp) * 75
+      );
+    }
+
+    cam.position.lerp(want.p, 0.12);
+    tgt.lerp(want.t, 0.14);
+    cam.fov += (want.f - cam.fov) * 0.12;
+    cam.updateProjectionMatrix();
+    cam.lookAt(tgt);
+    R.render(S, cam);
+  })();
+
+  return api;
+}
+
+// --- REACT APPLICATION ---
+function App() {
+  const host = useRef();
+  const api = useRef();
+
+  const [u, setU] = useState({ mode: 'over' });
+  const [hover, setHover] = useState(null);
+  const [filter, setFilter] = useState('ALL');
+  const [dayMode, setDayMode] = useState(false);
+  const [sightlineOn, setSightlineOn] = useState(false);
+  const [pickRow, setPickRow] = useState(0);
+  const [pickSeat, setPickSeat] = useState(0);
+  const [cart, setCart] = useState([]);
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [booked, setBooked] = useState(false);
+
+  useEffect(() => {
+    api.current = bootStadium(host.current, {
+      onState: s => {
+        setU(s);
+        if (s.mode === 'seat') { setPickRow(s.r); setPickSeat(s.s); }
+      },
+      onHover: setHover
+    });
+    return () => api.current.dispose();
+  }, []);
+
+  useEffect(() => {
+    if (api.current) api.current.syncCart(cart.map(item => item.key));
+  }, [cart]);
+
+  const totalAmount = useMemo(() => cart.reduce((sum, item) => sum + item.p, 0), [cart]);
+  const isCurrentInCart = u.mode === 'seat' && cart.some(x => x.key === u.key);
+
+  const toggleSeatInCart = seatObj => {
+    setCart(prev => {
+      const exists = prev.some(x => x.key === seatObj.key);
+      if (exists) return prev.filter(x => x.key !== seatObj.key);
+      if (prev.length >= 6) return prev;
+      return [...prev, seatObj];
+    });
+  };
+
+  const removeFromCart = key => setCart(prev => prev.filter(x => x.key !== key));
+
+  let cardContent;
+  if (u.mode === 'over') {
+    cardContent = h('div', { className: 'card' },
+      h('div', { className: 'card-header' },
+        h('div', null,
+          h('div', { className: 'ttl' }, 'Gaddafi Bowl · Real Match Specs'),
+          h('div', { className: 'sub' }, 'Click any enclosure to inspect row availability, exact distance to the 20.12m pitch & boundary rope, and first-person seat POV.')
+        ),
+        h('span', { className: 'badge-cat', style: { background: 'rgba(245,197,66,0.16)', color: '#f5c542', border: '1px solid #f5c542' } }, 'TICKETS LIVE')
+      ),
+      h('div', { className: 'stats-grid' },
+        h('div', { className: 'stat-box' }, h('div', { className: 'stat-val', style: { color: '#f5c542' } }, `${PITCH_LEN_M}m`), h('div', { className: 'stat-lbl' }, 'Pitch (22 yd)')),
+        h('div', { className: 'stat-box' }, h('div', { className: 'stat-val' }, `${CIRCLE_R_M}m`), h('div', { className: 'stat-lbl' }, '30-Yd Circle')),
+        h('div', { className: 'stat-box' }, h('div', { className: 'stat-val' }, `${ROWS}×${PER}`), h('div', { className: 'stat-lbl' }, 'Seats / Block')),
+        h('div', { className: 'stat-box' }, h('div', { className: 'stat-val' }, `${TOWER_H_M}m`), h('div', { className: 'stat-lbl' }, 'Floodlight Masts'))
+      ),
+      h('div', { className: 'perk-banner' },
+        h('span', null, '✓ Instant QR E-Pass · Verified Sightlines · Group Pairs Up to 6 Seats'),
+        h('b', null, 'PKR 1,500 – 12,000')
+      ),
+      h('div', { className: 'leg' },
+        [
+          ['PCB Gallery · PKR 12,000', '#e0508a'],
+          ['VIP · PKR 6,000', '#f08a24'],
+          ['Premium · PKR 4,000', '#7a5cff'],
+          ['General · PKR 1,500', '#2f6bff']
+        ].map(([label, color]) => h('span', { key: label }, h('i', { style: { background: color } }), label))
+      ),
+      cart.length > 0 && h('div', { className: 'row' },
+        h('button', { className: 'btn go', onClick: () => { setBooked(false); setCheckoutOpen(true); } },
+          `Reserve ${cart.length} Seat${cart.length > 1 ? 's' : ''} · ${pkr(totalAmount)} →`
+        )
+      )
+    );
+  } else if (u.mode === 'section') {
+    const pct = Math.round((u.n / u.total) * 100);
+    cardContent = h('div', { className: 'card' },
+      h('div', { className: 'card-header' },
+        h('div', null,
+          h('div', { className: 'ttl' }, `${u.z} · Block ${u.id}`),
+          h('div', { className: 'sub' }, `${u.lvl} · ${u.viewAngle} · `, h('b', null, pkr(u.p) + ' / seat'))
+        ),
+        h('span', { className: 'badge-cat', style: { background: u.css + '33', color: u.css, border: `1px solid ${u.css}` } }, u.cat)
+      ),
+      h('div', { className: 'stats-grid' },
+        h('div', { className: 'stat-box' }, h('div', { className: 'stat-val', style: { color: '#10b981' } }, `${u.n} / ${u.total}`), h('div', { className: 'stat-lbl' }, 'Seats Open')),
+        h('div', { className: 'stat-box' }, h('div', { className: 'stat-val' }, `${pct}%`), h('div', { className: 'stat-lbl' }, 'Open Rate')),
+        h('div', { className: 'stat-box' }, h('div', { className: 'stat-val', style: { color: '#f5c542' } }, `~${u.pitchDistM}m`), h('div', { className: 'stat-lbl' }, 'To Pitch')),
+        h('div', { className: 'stat-box' }, h('div', { className: 'stat-val' }, `${u.frontRowOpen}`), h('div', { className: 'stat-lbl' }, 'Front A–C Open'))
+      ),
+      h('div', { className: 'buyer-grid' },
+        h('div', { className: 'buyer-pill' }, h('span', null, 'Value Metric'), h('b', null, `~PKR ${u.pkrPerMeter} / meter to pitch`)),
+        h('div', { className: 'buyer-pill' }, h('span', null, 'Block Layout'), h('b', null, `${u.rows} Rows × ${u.perRow} Seats`)),
+        h('div', { className: 'buyer-pill' }, h('span', null, 'Viewing Angle'), h('b', null, u.viewAngle))
+      ),
+      h('div', { className: 'seat-picker' },
+        h('label', null, 'Row'),
+        h('select', { value: pickRow, onChange: e => { const nr = +e.target.value; setPickRow(nr); api.current.jumpToSeat(nr, pickSeat); } },
+          Array.from({ length: ROWS }).map((_, idx) => h('option', { key: idx, value: idx }, `Row ${rowLetter(idx)}`))
+        ),
+        h('label', null, 'Seat'),
+        h('select', { value: pickSeat, onChange: e => { const ns = +e.target.value; setPickSeat(ns); api.current.jumpToSeat(pickRow, ns); } },
+          Array.from({ length: PER }).map((_, idx) => h('option', { key: idx, value: idx }, `Seat ${idx + 1}`))
+        ),
+        h('button', { className: 'mini-btn', onClick: () => api.current.jumpBestValueSeat() }, '★ Best Pair Seat')
+      ),
+      h('div', { className: 'row' },
+        h('button', { className: 'btn', onClick: () => api.current.over() }, '← Stadium Map'),
+        cart.length > 0 && h('button', { className: 'btn go', onClick: () => { setBooked(false); setCheckoutOpen(true); } },
+          `Checkout (${cart.length}) · ${pkr(totalAmount)}`
+        )
+      )
+    );
+  } else {
+    cardContent = h('div', { className: 'card' },
+      h('div', { className: 'card-header' },
+        h('div', null,
+          h('div', { className: 'ttl' }, `${u.z} · Row ${u.rowLabel} · Seat ${u.seatNum}`),
+          h('div', { className: 'sub' }, `${u.cat} · ${u.obstructionStatus} · `, h('b', null, pkr(u.p)))
+        ),
+        h('span', { className: 'badge-cat', style: { background: 'rgba(16,185,129,0.18)', color: '#6ee7b7', border: '1px solid #10b981' } }, u.buyerPick)
+      ),
+      h('div', { className: 'stats-grid' },
+        h('div', { className: 'stat-box' }, h('div', { className: 'stat-val', style: { color: '#f5c542' } }, `${u.pitchDistM}m`), h('div', { className: 'stat-lbl' }, 'To Pitch')),
+        h('div', { className: 'stat-box' }, h('div', { className: 'stat-val' }, `${u.boundaryDistM}m`), h('div', { className: 'stat-lbl' }, 'To Rope')),
+        h('div', { className: 'stat-box' }, h('div', { className: 'stat-val' }, `+${u.heightM}m`), h('div', { className: 'stat-lbl' }, 'Elevation')),
+        h('div', { className: 'stat-box' }, h('div', { className: 'stat-val', style: { fontSize: '11px' } }, u.angleLabel), h('div', { className: 'stat-lbl' }, 'Sightline'))
+      ),
+      h('div', { className: 'buyer-grid' },
+        h('div', { className: 'buyer-pill' }, h('span', null, 'Pitch Span'), h('b', null, `${u.pitchAngularDeg}° (20.12m pitch)`)),
+        h('div', { className: 'buyer-pill' }, h('span', null, 'Stump Clarity'), h('b', null, `${u.stumpAngularArcMin}' arc · ${u.ropeFromPitchM}m rope`)),
+        h('div', { className: 'buyer-pill' }, h('span', null, 'Group & Access'), h('b', null, `${u.adjacentOpen} open beside · ${u.aisleAccess}`))
+      ),
+      h('div', { className: 'seat-picker' },
+        h('label', null, 'Row'),
+        h('select', { value: pickRow, onChange: e => { const nr = +e.target.value; setPickRow(nr); api.current.jumpToSeat(nr, pickSeat); } },
+          Array.from({ length: ROWS }).map((_, idx) => h('option', { key: idx, value: idx }, `Row ${rowLetter(idx)}`))
+        ),
+        h('label', null, 'Seat'),
+        h('select', { value: pickSeat, onChange: e => { const ns = +e.target.value; setPickSeat(ns); api.current.jumpToSeat(pickRow, ns); } },
+          Array.from({ length: PER }).map((_, idx) => h('option', { key: idx, value: idx }, `Seat ${idx + 1}`))
+        ),
+        h('button', { className: 'mini-btn', onClick: () => api.current.jumpBestValueSeat() }, '★ Best Pair')
+      ),
+      cart.length > 0 && h('div', { className: 'cart-list' },
+        cart.map(item => h('div', { className: 'seat-pill', key: item.key },
+          `${item.z.split(' ')[0]} R${item.rowLabel}-S${item.seatNum}`,
+          h('button', { onClick: () => removeFromCart(item.key), title: 'Remove seat' }, '×')
+        ))
+      ),
+      h('div', { className: 'row' },
+        h('button', { className: 'btn', onClick: () => api.current.section() }, '← Block Seats'),
+        h('button', {
+          className: 'btn',
+          style: isCurrentInCart ? { borderColor: '#10b981', color: '#10b981' } : {},
+          onClick: () => toggleSeatInCart(u)
+        }, isCurrentInCart ? '✓ Seat Added' : '+ Add This Seat'),
+        cart.length > 0 && h('button', {
+          className: 'btn go',
+          onClick: () => { setBooked(false); setCheckoutOpen(true); }
+        }, `Pay ${pkr(totalAmount)} →`)
+      )
+    );
+  }
+
+  return h('div', { className: 'app' },
+    h('div', { className: 'cv', ref: host }),
+
+    u.mode === 'seat' && h('div', { className: 'pov-hud' },
+      h('div', { className: 'pov-compass' },
+        h('span', null, `PITCH: ${u.pitchDistM}M · ROPE: ${u.boundaryDistM}M · +${u.heightM}M`),
+        h('span', { style: { color: '#94a3b8' } }, '|'),
+        h('span', { style: { color: '#f5c542' } }, `ROW ${u.rowLabel} · SEAT ${u.seatNum} (${pkr(u.p)})`)
+      ),
+      h('div', { className: 'pov-quick-cams' },
+        h('button', { className: 'cam-snap', onClick: () => api.current.snapPovTarget('PITCH') }, '🏏 Focus Pitch'),
+        h('button', { className: 'cam-snap', onClick: () => api.current.snapPovTarget('SCOREBOARD') }, '📺 Scoreboard'),
+        h('button', { className: 'cam-snap', onClick: () => api.current.snapPovTarget('WIDE') }, '👁️ Wide Angle'),
+        h('button', { className: 'cam-snap', onClick: () => api.current.triggerBoundaryHit() }, '⚡ Boundary Shot'),
+        h('button', {
+          className: 'cam-snap' + (sightlineOn ? ' active' : ''),
+          onClick: () => { const n = !sightlineOn; setSightlineOn(n); api.current.setSightlineBeam(n); }
+        }, '📡 Sightline Line')
+      ),
+      h('div', { className: 'pov-hint' }, 'Drag to look 360° from your seat · Scroll to zoom')
+    ),
+
+    hover && h('div', { className: 'tooltip', style: { left: hover.x + 'px', top: hover.y + 'px' } },
+      h('div', { className: 'tooltip-title' }, hover.title),
+      h('div', { className: 'tooltip-sub' }, hover.sub)
+    ),
+
+    h('div', { className: 'top' },
+      h('div', { className: 'brand-wrap' },
+        h('div', { className: 'brand' },
+          'GADDAFI ', h('b', null, 'STADIUM'),
+          h('span', { className: 'live-badge' }, h('i', { className: 'live-dot' }), 'MATCH VIEW + ECO')
+        ),
+        h('div', { className: 'match' }, 'HBL PSL 11 · LAHORE QALANDARS VS ISLAMABAD UNITED · INTERACTIVE SEAT POV')
+      ),
+      h('div', { className: 'controls-top' },
+        h('button', { className: 'pill-btn', onClick: () => api.current.zoom(-25), title: 'Zoom In' }, '+'),
+        h('button', { className: 'pill-btn', onClick: () => api.current.zoom(25), title: 'Zoom Out' }, '−'),
+        h('button', { className: 'pill-btn', onClick: () => api.current.triggerBoundaryHit() }, '⚡ Hit Boundary'),
+        h('button', {
+          className: 'pill-btn' + (dayMode ? ' active' : ''),
+          onClick: () => { const nd = !dayMode; setDayMode(nd); api.current.setDayNight(nd); }
+        }, dayMode ? '☀️ Day Match' : '🌙 Floodlights'),
+        cart.length > 0 && h('button', {
+          className: 'pill-btn cart-top',
+          onClick: () => { setBooked(false); setCheckoutOpen(true); }
+        }, `Cart (${cart.length}) · ${pkr(totalAmount)}`)
+      )
+    ),
+
+    u.mode === 'over' && h('div', { className: 'filter-bar' },
+      [
+        ['ALL', 'All Enclosures', '#ffffff'],
+        ['PCB Gallery', 'PCB Gallery · 12k', '#e0508a'],
+        ['VIP', 'VIP · 6k', '#f08a24'],
+        ['Premium', 'Premium · 4k', '#7a5cff'],
+        ['General', 'General · 1.5k', '#2f6bff']
+      ].map(([key, label, col]) => h('button', {
+        key,
+        className: 'chip' + (filter === key ? ' active' : ''),
+        onClick: () => { setFilter(key); api.current.filter(key); }
+      }, h('i', { style: { background: col } }), label))
+    ),
+
+    cardContent,
+
+    checkoutOpen && h('div', { className: 'modal-backdrop', onClick: () => setCheckoutOpen(false) },
+      h('div', { className: 'modal', onClick: e => e.stopPropagation() },
+        !booked ? [
+          h('div', { key: 'h', className: 'ttl' }, 'Confirm Your PSL Tickets'),
+          h('div', { key: 's', className: 'sub' }, 'Gaddafi Stadium, Lahore · Instant QR entry pass upon confirmation.'),
+          h('div', { key: 'list', style: { marginTop: '14px', maxHeight: '180px', overflowY: 'auto' } },
+            cart.map(item => h('div', {
+              key: item.key,
+              style: { display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.08)', fontSize: '13px' }
+            },
+              h('span', null, h('b', null, item.z), ` · Row ${item.rowLabel}, Seat ${item.seatNum}`),
+              h('span', { style: { color: '#f5c542', fontWeight: 700 } }, pkr(item.p))
+            ))
+          ),
+          h('div', {
+            key: 'tot',
+            style: { display: 'flex', justifyContent: 'space-between', marginTop: '14px', fontSize: '15px', fontWeight: 800 }
+          },
+            h('span', null, `Total (${cart.length} Ticket${cart.length > 1 ? 's' : ''})`),
+            h('span', { style: { color: '#f5c542' } }, pkr(totalAmount))
+          ),
+          h('div', { key: 'act', className: 'row', style: { marginTop: '18px' } },
+            h('button', { className: 'btn', onClick: () => setCheckoutOpen(false) }, 'Cancel'),
+            h('button', { className: 'btn go', onClick: () => setBooked(true) }, 'Issue E-Tickets ✓')
+          )
+        ] : [
+          h('div', { key: 'bh', className: 'ttl', style: { color: '#10b981' } }, '✓ Booking Confirmed!'),
+          h('div', { key: 'bs', className: 'sub' }, 'Present this digital pass at the stadium turnstile.'),
+          h('div', { key: 'tk', className: 'ticket-card' },
+            h('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '10px' } },
+              h('div', null,
+                h('div', { style: { fontSize: '11px', color: '#f5c542', fontWeight: 800, letterSpacing: '0.1em' } }, 'HBL PSL 11 · OFFICIAL PASS'),
+                h('div', { style: { fontSize: '15px', fontWeight: 800, marginTop: '4px' } }, `${cart.length}x Verified Entry`),
+                h('div', { style: { fontSize: '11px', color: '#9aa6d6', marginTop: '4px' } },
+                  cart.map(c => `${c.z.split(' ')[0]} (R${c.rowLabel}-S${c.seatNum})`).join(' · ')
+                ),
+                h('div', { style: { fontSize: '12px', fontWeight: 700, color: '#10b981', marginTop: '6px' } }, `Paid: ${pkr(totalAmount)}`)
+              ),
+              h('div', { className: 'qr-box' },
+                Array.from({ length: 16 }).map((_, idx) =>
+                  h('div', { key: idx, className: 'qr-cell', style: { opacity: (idx * 7) % 3 === 0 ? 0.15 : 1 } })
+                )
+              )
+            )
+          ),
+          h('div', { key: 'done', className: 'row' },
+            h('button', {
+              className: 'btn go',
+              onClick: () => { setCart([]); setCheckoutOpen(false); api.current.over(); }
+            }, 'Done')
+          )
+        ]
+      )
+    )
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(h(App));
+</script>
+</body>
+</html>
